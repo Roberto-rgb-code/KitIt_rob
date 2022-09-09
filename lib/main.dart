@@ -19,7 +19,7 @@ class MyApp extends StatelessWidget {
 
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Info Ruta ',
+      title: 'z',
       debugShowCheckedModeBanner: false,
       initialRoute: 'map',
       routes: 
