@@ -169,6 +169,7 @@ class _ventana_modal_viewState extends State<ventana_modal_view> {
                     );
                   },
                 );
+                
               });
             },
           ),

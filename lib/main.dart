@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:kitit/pages/page_modal_window.dart';
 import 'package:kitit/pages/map.dart';
 
-
 void main() {
   HttpOverrides.global = new MyHttpOverrides();
   runApp(const MyApp());
@@ -16,16 +15,22 @@ class MyApp extends StatelessWidget {
   // This widget is the root of your application.
 
   @override
-
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'z',
-      debugShowCheckedModeBanner: false,
-      initialRoute: 'map',
-      routes: 
-      {
-      'map': (BuildContext context) => Map1(),
-      }
-    );
+        title: 'z',
+        debugShowCheckedModeBanner: false,
+        initialRoute: 'map',
+        routes: {
+          'map': (BuildContext context) => Map1(),
+        });
   }
-} 
+}
+
+class MyHttpOverrides extends HttpOverrides {
+  @override
+  HttpClient createHttpClient(SecurityContext? context) {
+    return super.createHttpClient(context)
+      ..badCertificateCallback =
+          (X509Certificate cert, String host, int port) => true;
+  }
+}
