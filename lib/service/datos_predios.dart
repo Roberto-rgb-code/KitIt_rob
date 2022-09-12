@@ -1,16 +1,19 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 
-Future<dynamic> data_predio(nombre1,nombre2,numero) async {
+Future<dynamic> data_predio(nombre1, nombre2, numero) async {
+  print(nombre1);
+  print(nombre2);
+  print(numero);
   final response = await http.get(Uri.parse(
       'https://visorurbano.com:3000/api/v2/catastro/predio/search?calle=${nombre1}%20${nombre2}&numeroExterior=${numero}'));
-      // https://visorurbano.com:3000/api/v2/catastro/predio/search?calle=SANCHEZ%20PRISCILIANO&numeroExterior=595
+  // https://visorurbano.com:3000/api/v2/catastro/predio/search?calle=SANCHEZ%20PRISCILIANO&numeroExterior=595
 
   if (response.statusCode == 200) {
     // If the server did return a 200 OK response,
     // then parse the JSON.
     var data = json.decode(response.body);
-
+    
     return data;
   } else {
     // If the server did not return a 200 OK response,
