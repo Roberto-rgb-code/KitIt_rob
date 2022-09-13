@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'dart:async';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:kitit/service/datos_predios.dart';
+import 'package:geocoding/geocoding.dart';
 
 class Map1 extends StatefulWidget {
   Map1({Key? key}) : super(key: key);
@@ -41,8 +42,11 @@ class _Map1State extends State<Map1> {
 
     var device_data = MediaQuery.of(context);
 
+    Completer<GoogleMapController> _controller = Completer();
+
     GoogleMap mapa = GoogleMap(
       mapType: MapType.normal,
+      zoomControlsEnabled: false,
       onTap: onTap,
       markers: markers,
       initialCameraPosition: _kGooglePlex,
@@ -63,12 +67,57 @@ class _Map1State extends State<Map1> {
               ),
             ),
             Container(
-              padding: const EdgeInsets.only(left: 20),
+              decoration: const BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.all(Radius.circular(5))),
               margin: const EdgeInsets.only(top: 70, left: 10, right: 10),
-              color: Colors.white,
-              child: TextField(
-                controller: _textLugar,
-                decoration: InputDecoration(labelText: "Ingrese su direccion"),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  SizedBox(
+                    width: device_data.size.width * 0.7,
+                    child: TextField(
+                      controller: _textLugar,
+                      decoration: const InputDecoration(
+                          labelText: "Ingrese su direccion",
+                          border: OutlineInputBorder(
+                              borderSide:
+                                  BorderSide(style: BorderStyle.none, width: 0),
+                              borderRadius:
+                                  BorderRadius.all(Radius.circular(5.0)))),
+                    ),
+                  ),
+
+                  ElevatedButton(
+                      onPressed: () async {
+                        print('ENTRE AL ZOOM');
+
+                        print('Esperando...');
+
+                        List<Location> locations = await locationFromAddress(
+                            "${_textLugar.text}, Guadalajara, Jal.");
+
+                        print('LOCATIONS: ');
+                        print(locations[0]);
+
+                        // CameraPosition _kLake = const CameraPosition(
+                        //     target: LatLng(20.7016358, -103.3867676), zoom: 15);
+
+                        // final GoogleMapController controller =
+                        //     await _controller.future;
+                        // controller.animateCamera(
+                        //     CameraUpdate.newCameraPosition(_kLake));
+                      },
+                      child: const Icon(Icons.search))
+
+                  // IconButton(
+                  //     color: Colors.black,
+                  //     onPressed: searchAddres(textLugar.text),
+                  //     // onPressed: () {
+                  //     //   print('aAAAAAAAAa');
+                  //     // },
+                  //     icon: const Icon(Icons.search))
+                ],
               ),
             ),
           ],
@@ -81,6 +130,7 @@ class _Map1State extends State<Map1> {
       floatingActionButton: Container(
         padding: const EdgeInsetsDirectional.only(start: 20),
         child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceAround,
           children: [
             FloatingActionButton(
               onPressed: () {
@@ -100,7 +150,7 @@ class _Map1State extends State<Map1> {
                 // nombre1, nombre2 y numero
                 var minusculas = _textLugar.text.toUpperCase();
                 var texto_split = minusculas.split(" ");
-                
+
                 if (texto_split.length == 1) {
                   texto_split.add(" ");
                   texto_split.add(" ");
@@ -303,11 +353,6 @@ class _Map1State extends State<Map1> {
         ),
       ),
     );
-  }
-
-  Future<void> _goToTheLake() async {
-    final GoogleMapController controller = await _controller.future;
-    controller.animateCamera(CameraUpdate.newCameraPosition(_kLake));
   }
 
   void onTap(LatLng position) {
