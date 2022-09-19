@@ -4,6 +4,8 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:kitit/service/datos_predios.dart';
 import 'package:geocoding/geocoding.dart';
 
+import '../widgets/drawer.dart';
+
 class Map1 extends StatefulWidget {
   Map1({Key? key}) : super(key: key);
 
@@ -43,6 +45,8 @@ class _Map1State extends State<Map1> {
     // final TextEditingController textLugar = TextEditingController();
 
     String? address;
+    
+
 
     var device_data = MediaQuery.of(context);
 
@@ -116,6 +120,7 @@ class _Map1State extends State<Map1> {
     }
 
     return Scaffold(
+      drawer: const DrawerWidget(),
       body: Center(
         child: SingleChildScrollView(
           child: Stack(
@@ -128,15 +133,18 @@ class _Map1State extends State<Map1> {
                 ),
               ),
               Container(
+                
                 padding: const EdgeInsets.only(top: 7),
                 decoration: const BoxDecoration(
                     color: Colors.white,
                     borderRadius: BorderRadius.all(Radius.circular(5))),
                 margin: const EdgeInsets.only(top: 70, left: 10, right: 10),
                 child: Row(
+                    
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: [
                     SizedBox(
+                     
                       width: device_data.size.width * 0.7,
                       child: TextField(
                         controller: _textLugar,
@@ -145,6 +153,7 @@ class _Map1State extends State<Map1> {
                           print(direccion.value);
                         },
                         decoration: const InputDecoration(
+                            
                             labelText: "Ingrese su direccion",
                             border: OutlineInputBorder(
                                 borderSide: BorderSide(
