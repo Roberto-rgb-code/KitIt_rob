@@ -51,8 +51,6 @@ class _Map1State extends State<Map1> {
     // final TextEditingController textLugar = TextEditingController();
 
     String? address;
-    
-
 
     var device_data = MediaQuery.of(context);
 
@@ -139,18 +137,15 @@ class _Map1State extends State<Map1> {
                 ),
               ),
               Container(
-                
                 padding: const EdgeInsets.only(top: 7),
                 decoration: const BoxDecoration(
                     color: Colors.white,
                     borderRadius: BorderRadius.all(Radius.circular(5))),
                 margin: const EdgeInsets.only(top: 70, left: 10, right: 10),
                 child: Row(
-                    
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: [
                     SizedBox(
-                     
                       width: device_data.size.width * 0.7,
                       child: TextField(
                         controller: _textLugar,
@@ -159,7 +154,6 @@ class _Map1State extends State<Map1> {
                           print(direccion.value);
                         },
                         decoration: const InputDecoration(
-                            
                             labelText: "Ingrese su direccion",
                             border: OutlineInputBorder(
                                 borderSide: BorderSide(
@@ -304,16 +298,16 @@ class _Map1State extends State<Map1> {
 
                         // FocusScope.of(context).requestFocus(new FocusNode());
                         // nombre1, nombre2 y numero
-                        var minusculas = _textLugar.text.toUpperCase();
-                        var texto_split = minusculas.split(" ");
+                        // var minusculas = _textLugar.text.toUpperCase();
+                        // var texto_split = minusculas.split(" ");
 
-                        if (texto_split.length == 1) {
-                          texto_split.add(" ");
-                          texto_split.add(" ");
-                        }
-                        if (texto_split.length == 2) {
-                          texto_split.add(" ");
-                        }
+                        // if (texto_split.length == 1) {
+                        //   texto_split.add(" ");
+                        //   texto_split.add(" ");
+                        // }
+                        // if (texto_split.length == 2) {
+                        //   texto_split.add(" ");
+                        // }
                         print('Posicion colocada:::::::::::::::::::: ');
                         print(postionOnTap!.latitude);
                         print(postionOnTap!.longitude);
@@ -327,9 +321,7 @@ class _Map1State extends State<Map1> {
                         print(coordsUTM);
                         // AQUI LE CAMBIAS DANIEL SANCHEZ SIMUTA !!!!!!
 
-                        data_predio(
-                                texto_split[0], texto_split[1], texto_split[2])
-                            .then(
+                        data_predio_cordenada(coordsUTM).then(
                           (value) {
                             if (value.length == 0) {
                               //redondeo de cus
@@ -534,17 +526,14 @@ class _Map1State extends State<Map1> {
                         // nombre1, nombre2 y numero
                         var minusculas = _textLugar.text.toUpperCase();
                         var texto_split = minusculas.split(" ");
+                        // GARCIA JESUS 3020
 
-                        if (texto_split.length == 1) {
-                          texto_split.add(" ");
-                          texto_split.add(" ");
-                        }
-                        if (texto_split.length == 2) {
-                          texto_split.add(" ");
-                        }
-                        data_predio(
-                                texto_split[0], texto_split[1], texto_split[2])
-                            .then(
+                        var numero = texto_split.last;
+                        texto_split.removeLast();
+
+                        var nombre = texto_split.join(" ");
+
+                        data_predio(nombre, numero).then(
                           (value) {
                             if (value.length == 0) {
                               //redondeo de cus

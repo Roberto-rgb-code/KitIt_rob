@@ -29,7 +29,7 @@ class _ventana_modal_viewState extends State<ventana_modal_view> {
             child: const Text('Modal window'),
             onPressed: () {
               // nombre1, nombre2 y numero
-              data_predio("SANCHEZ", "PRISCILIANO", "595").then((value) {
+              data_predio("SANCHEZ", "PRISCILIANO").then((value) {
                 //redondeo de cus
                 List<Widget> usos_permitidos_list = [];
                 List<Widget> usos_no_permitidos_list = [];
@@ -169,7 +169,6 @@ class _ventana_modal_viewState extends State<ventana_modal_view> {
                     );
                   },
                 );
-                
               });
             },
           ),

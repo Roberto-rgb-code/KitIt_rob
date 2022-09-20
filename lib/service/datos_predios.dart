@@ -1,19 +1,39 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 
-Future<dynamic> data_predio(nombre1, nombre2, numero) async {
-  print(nombre1);
-  print(nombre2);
-  print(numero);
+Future<dynamic> data_predio(nombre, numero) async {
   final response = await http.get(Uri.parse(
-      'https://visorurbano.com:3000/api/v2/catastro/predio/search?calle=${nombre1}%20${nombre2}&numeroExterior=${numero}'));
-  // https://visorurbano.com:3000/api/v2/catastro/predio/search?calle=SANCHEZ%20PRISCILIANO&numeroExterior=595
+      'https://visorurbano.com:3000/api/v2/catastro/predio/search?calle=${nombre}&numeroExterior=${numero}'));
 
   if (response.statusCode == 200) {
     // If the server did return a 200 OK response,
     // then parse the JSON.
     var data = json.decode(response.body);
-    
+
+    return data;
+  } else {
+    // If the server did not return a 200 OK response,
+    // then throw an exception.
+    throw Exception('Failed to load album');
+  }
+}
+
+Future<dynamic> data_predio_cordenada(list_cordenadas) async {
+  // print(nombre1);
+  // print(nombre2);
+  // print(numero);
+  String url =
+      "https://visorurbano.com:3000/api/v2/catastro/predio/${list_cordenadas[0]}/${list_cordenadas[1]}";
+  print("?????????????????????????????????????????");
+  print(url);
+  final response = await http.get(Uri.parse(url));
+
+  if (response.statusCode == 200) {
+    // If the server did return a 200 OK response,
+    // then parse the JSON.
+    var data = json.decode(response.body);
+    print(data);
+
     return data;
   } else {
     // If the server did not return a 200 OK response,
