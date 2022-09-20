@@ -3,8 +3,13 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:kitit/pages/page_modal_window.dart';
 import 'package:kitit/pages/map.dart';
+import 'package:kitit/resourses/exceReader.dart';
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  
+  await ExcelReader.init();
+
   HttpOverrides.global = new MyHttpOverrides();
   runApp(const MyApp());
 }
