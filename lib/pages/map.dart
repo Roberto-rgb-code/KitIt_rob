@@ -294,20 +294,7 @@ class _Map1State extends State<Map1> {
                     child: const Icon(Icons.remove_red_eye),
                     onPressed: () async {
                       if (wasTaped) {
-                        // ENTONCES HARAS LA BUSQUEDA POR COOORDENADAS
-
-                        // FocusScope.of(context).requestFocus(new FocusNode());
-                        // nombre1, nombre2 y numero
-                        // var minusculas = _textLugar.text.toUpperCase();
-                        // var texto_split = minusculas.split(" ");
-
-                        // if (texto_split.length == 1) {
-                        //   texto_split.add(" ");
-                        //   texto_split.add(" ");
-                        // }
-                        // if (texto_split.length == 2) {
-                        //   texto_split.add(" ");
-                        // }
+                        
                         print('Posicion colocada:::::::::::::::::::: ');
                         print(postionOnTap!.latitude);
                         print(postionOnTap!.longitude);
@@ -319,7 +306,6 @@ class _Map1State extends State<Map1> {
 
                         print('CORDENADAS UTM AAAAAAAAAAAAAAAAAAA');
                         print(coordsUTM);
-                        // AQUI LE CAMBIAS DANIEL SANCHEZ SIMUTA !!!!!!
 
                         data_predio_cordenada(coordsUTM).then(
                           (value) {
