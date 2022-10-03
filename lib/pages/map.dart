@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'dart:async';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:kitit/resourses/exceReader.dart';
+import 'package:kitit/service/MySQLConnection.dart';
 import 'package:kitit/service/datos_predios.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:geocoding/geocoding.dart' as geo;
@@ -248,20 +249,7 @@ class _Map1State extends State<Map1> {
           children: [
             FloatingActionButton(
               onPressed: () {
-                // final GoogleMapController controller = await _controller.future;
-
-                // LatLng latLngPosition = const LatLng(20.6711593, -103.3557154);
-
-                // controller.animateCamera(
-                //   CameraUpdate.newCameraPosition(
-                //     CameraPosition(
-                //       target: latLngPosition,
-                //       zoom: 11.54,
-                //     ),
-                //   ),
-                // );
-
-                // print('Comienza la funcion: ');
+                MySQLConnector.getData(45644);
 
                 _textLugar.clear();
 
@@ -449,7 +437,7 @@ class _Map1State extends State<Map1> {
                                                 "CUS permitido:  ${value[0]["zonificacion_default"]["cus_max"].toString()}"),
                                           ],
                                         ),
-                                        Divider(),
+                                        const Divider(),
                                         Container(
                                           padding:
                                               const EdgeInsetsDirectional.only(

@@ -4,11 +4,14 @@ import 'package:flutter/material.dart';
 import 'package:kitit/pages/page_modal_window.dart';
 import 'package:kitit/pages/map.dart';
 import 'package:kitit/resourses/exceReader.dart';
+import 'package:kitit/service/MySQLConnection.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  
+
   await ExcelReader.init();
+  
+  MySQLConnector();
 
   HttpOverrides.global = new MyHttpOverrides();
   runApp(const MyApp());
