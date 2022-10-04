@@ -17,7 +17,7 @@ class MySQLConnector {
 
   static void connection() async {
     connector = await MySQLConnection.createConnection(
-      host: "192.168.100.226",
+      host: "192.168.100.247",
       port: 3306,
       userName: "kikit2",
       password: "polloasado1",
@@ -34,12 +34,19 @@ class MySQLConnector {
     print(connector.connected);
   }
 
-  static void getData(CP) async {
-    var result = await connector
-        .execute("SELECT * FROM ageb WHERE codigoPostal = :CP",{'CP':CP});
+  static Future<List> getData(CP) async {
+    List geometry_list = [];
+    List aux = [];
+    var result = await connector.execute(
+        "select manz.geometry from ageb join manz on ageb.idageb = manz.idageb where ageb.codigoPostal= :CP",
+        {'CP': CP});
 
     for (final row in result.rows) {
-      print(row.assoc());
+      //print(row.assoc()["geometry"]);
+     
+      geometry_list.add([row.assoc()["geometry"]]);
+      
     }
+    return geometry_list;
   }
 }

@@ -39,6 +39,7 @@ dependencies:
   geocoding: ^2.0.5
   gsheets: ^0.4.2
   mysql_client: ^0.0.26
+  ffi: ^2.0.1
   
 dev_dependencies:
   flutter_test:

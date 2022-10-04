@@ -19,6 +19,11 @@ class Map1 extends StatefulWidget {
 }
 
 class _Map1State extends State<Map1> {
+  // Set<Polygon> _polygonSet = Set<Polygon>();
+  Set<Polygon> _polygonSet = new Set();
+
+  List lista_geometry = [];
+  @override
   final TextEditingController _textLugar = TextEditingController();
   Completer<GoogleMapController> _controller = Completer();
   int contador = 0;
@@ -96,9 +101,45 @@ class _Map1State extends State<Map1> {
       });
     }
 
+    Set<Polygon> myPolygon(List lista_geometry) {
+      print("lista que viene de DB -----------------------------");
+      print(lista_geometry.length);
+      int conta = 0;
+
+      // List lista_geometry = [
+      //   "-103.38999075,20.61684066,-103.38974568,20.61768809,-103.38947611,20.61762137,-103.38970602,20.61676763,-103.38999075,20.61684066",
+      //   "-103.383347711, 20.615803398, -103.38343297, 20.61585088, -103.38354794, 20.61591491, -103.383671, 20.61602312, -103.3843708, 20.61640928, -103.38418122, 20.61671897, -103.383972115, 20.617058984, -103.38397138, 20.61706018, -103.38480432, 20.61758386, -103.38473065, 20.61769997, -103.38267355, 20.61645432, -103.38315689, 20.61569712, -103.383347711, 20.615803398"
+      // ];
+      // List lista_geometry =
+      for (List lista in lista_geometry) {
+        print("lista en for each ------------------------");
+        print(lista);
+        List<LatLng> polygonCoords = geometry_data(lista);
+
+        _polygonSet.add(
+          Polygon(
+            polygonId: PolygonId('test ' + conta.toString()),
+            points: polygonCoords,
+            zIndex: 1,
+            strokeColor: Colors.red.shade600,
+            strokeWidth: 5,
+            fillColor: Colors.red.shade100,
+            geodesic: true,
+            onTap: () {
+              print("hola_____________________________________________");
+            },
+          ),
+        );
+        conta = conta + 1;
+      }
+      // print(_polygonSet.first.);
+      return _polygonSet;
+    }
+
     GoogleMap mapa = GoogleMap(
       mapType: MapType.normal,
       // zoomControlsEnabled: false,
+      polygons: _polygonSet,
       onTap: onTap,
       markers: markers,
       initialCameraPosition: _kGooglePlex,
@@ -155,7 +196,6 @@ class _Map1State extends State<Map1> {
                                     BorderRadius.all(Radius.circular(5.0)))),
                       ),
                     ),
-
                     ElevatedButton(
                         onPressed: () async {
                           // print('ENTRE AL ZOOM');
@@ -165,29 +205,19 @@ class _Map1State extends State<Map1> {
 
                           final locations = await getLocation();
 
-                          // double lat = locations[0].latitude;
-                          // double long = locations[0].longitude;
-
-                          // print('Entro a move camera');
-                          // double lat = 20.7016358;
-                          // double long = -103.3867676;
-
-                          // final GoogleMapController controller =
-                          //     await _controller.future;
-
                           LatLng latLngPosition = LatLng(
                               locations[0].latitude, locations[0].longitude);
 
-                          // controller.animateCamera(
-                          //   CameraUpdate.newCameraPosition(
-                          //     CameraPosition(
-                          //       target: latLngPosition,
-                          //       zoom: 20,
-                          //     ),
-                          //   ),
-                          // );
+                          List<Placemark> placemarks =
+                              await placemarkFromCoordinates(
+                                  latLngPosition.latitude,
+                                  latLngPosition.longitude);
+                          //placemarks[0].postalCode
+                          final resultados = await MySQLConnector.getData(
+                              placemarks[0].postalCode);
 
                           setState(() {
+                            myPolygon(resultados);
                             postionOnTap = latLngPosition;
                             if (contador == 0) {
                               contador += 1;
@@ -205,15 +235,6 @@ class _Map1State extends State<Map1> {
                                   _markersController.sink.add(id);
                                   latlon1 = latLngPosition;
                                 },
-                                // draggable: true,
-                                // onDragEnd: (newPosition) {
-                                //   //print("el marcador se puso en las longitudes $newPosition");
-                                //   print("latitud ");
-
-                                //   position = newPosition;
-
-                                //   print("POSI EN LA QUE PUSISTE EL MARCADOR WEY $position");
-                                // },
                               );
 
                               _markers[markerId] = marker;
@@ -223,14 +244,6 @@ class _Map1State extends State<Map1> {
                           });
                         },
                         child: const Icon(Icons.search))
-
-                    // IconButton(
-                    //     color: Colors.black,
-                    //     onPressed: searchAddres(textLugar.text),
-                    //     // onPressed: () {
-                    //     //   print('aAAAAAAAAa');
-                    //     // },
-                    //     icon: const Icon(Icons.search))
                   ],
                 ),
               ),
@@ -238,10 +251,6 @@ class _Map1State extends State<Map1> {
           ),
         ),
       ),
-      // Column(children: [
-
-      //   Center(child: Container(width: device_data.size.width,height: device_data.size.height-100,child: mapa,),)
-      // ],),
       floatingActionButton: Container(
         padding: const EdgeInsetsDirectional.only(start: 20),
         child: Row(
@@ -249,8 +258,7 @@ class _Map1State extends State<Map1> {
           children: [
             FloatingActionButton(
               onPressed: () {
-                MySQLConnector.getData(45644);
-
+                _polygonSet.clear();
                 _textLugar.clear();
 
                 setState(() {
@@ -540,5 +548,24 @@ class _Map1State extends State<Map1> {
         style: TextStyle(fontSize: size_word),
       ),
     );
+  }
+
+  List<LatLng> geometry_data(List data) {
+    var data_geometry = data;
+    List<LatLng> polygonCoords = [];
+
+    print(data.length);
+    print("===========================================================");
+    print(data[0]);
+    print(data[0].runtimeType);
+    var new_list = data[0].replaceAll(" ", "").split(",");
+
+    while (new_list.isNotEmpty) {
+      var lat = double.parse(new_list.removeLast());
+      var lon = double.parse(new_list.removeLast());
+      polygonCoords.add(LatLng(lat, lon));
+    }
+
+    return polygonCoords;
   }
 }
