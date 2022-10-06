@@ -26,7 +26,7 @@ class MySQLConnector {
     print('CONENCTANDO A BASE DE DATOS');
     await connector.connect();
     print(
-        'Conexión exitosa a la base de datos|||||||||||||||||||||||||||||||||||||||||||||||||||||||||');
+        'Conexión exitosa a la base de datos');
   }
 
   static void prueba() {
@@ -38,14 +38,14 @@ class MySQLConnector {
     List geometry_list = [];
     List aux = [];
     var result = await connector.execute(
-        "select manz.geometry from ageb join manz on ageb.idageb = manz.idageb where ageb.codigoPostal= :CP",
+        // "SELECT * FROM agebs where region=5 ",
+        "select agebs.geometry from agebs  where agebs.codigoPostal= :CP",
         {'CP': CP});
 
     for (final row in result.rows) {
       //print(row.assoc()["geometry"]);
-     
+
       geometry_list.add([row.assoc()["geometry"]]);
-      
     }
     return geometry_list;
   }

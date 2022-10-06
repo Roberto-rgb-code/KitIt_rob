@@ -8,6 +8,7 @@ import 'package:kitit/service/MySQLConnection.dart';
 import 'package:kitit/service/datos_predios.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:geocoding/geocoding.dart' as geo;
+import 'package:kitit/widgets/modal_window.dart';
 
 import '../widgets/drawer.dart';
 
@@ -23,8 +24,10 @@ class _Map1State extends State<Map1> {
   Set<Polygon> _polygonSet = new Set();
 
   List lista_geometry = [];
+
   @override
   final TextEditingController _textLugar = TextEditingController();
+
   Completer<GoogleMapController> _controller = Completer();
   int contador = 0;
   LatLng? postionOnTap;
@@ -46,6 +49,7 @@ class _Map1State extends State<Map1> {
 
   @override
   Widget build(BuildContext context) {
+    // _textLugar.text = "Jesus Garcia 3020";
     // final TextEditingController textLugar = TextEditingController();
 
     String? address;
@@ -86,15 +90,6 @@ class _Map1State extends State<Map1> {
             _markersController.sink.add(id);
             latlon1 = latLngPosition;
           },
-          // draggable: true,
-          // onDragEnd: (newPosition) {
-          //   //print("el marcador se puso en las longitudes $newPosition");
-          //   print("latitud ");
-
-          //   position = newPosition;
-
-          //   print("POSI EN LA QUE PUSISTE EL MARCADOR WEY $position");
-          // },
         );
 
         _markers[markerId] = marker;
@@ -102,15 +97,11 @@ class _Map1State extends State<Map1> {
     }
 
     Set<Polygon> myPolygon(List lista_geometry) {
+   
       print("lista que viene de DB -----------------------------");
       print(lista_geometry.length);
       int conta = 0;
-
-      // List lista_geometry = [
-      //   "-103.38999075,20.61684066,-103.38974568,20.61768809,-103.38947611,20.61762137,-103.38970602,20.61676763,-103.38999075,20.61684066",
-      //   "-103.383347711, 20.615803398, -103.38343297, 20.61585088, -103.38354794, 20.61591491, -103.383671, 20.61602312, -103.3843708, 20.61640928, -103.38418122, 20.61671897, -103.383972115, 20.617058984, -103.38397138, 20.61706018, -103.38480432, 20.61758386, -103.38473065, 20.61769997, -103.38267355, 20.61645432, -103.38315689, 20.61569712, -103.383347711, 20.615803398"
-      // ];
-      // List lista_geometry =
+      var aux;
       for (List lista in lista_geometry) {
         print("lista en for each ------------------------");
         print(lista);
@@ -118,27 +109,26 @@ class _Map1State extends State<Map1> {
 
         _polygonSet.add(
           Polygon(
-            polygonId: PolygonId('test ' + conta.toString()),
-            points: polygonCoords,
-            zIndex: 1,
-            strokeColor: Colors.red.shade600,
-            strokeWidth: 5,
-            fillColor: Colors.red.shade100,
-            geodesic: true,
-            onTap: () {
-              print("hola_____________________________________________");
-            },
-          ),
+              polygonId: PolygonId('test $conta'),
+              points: polygonCoords,
+              consumeTapEvents: true,
+              zIndex: 1,
+              strokeColor: Colors.red.shade600,
+              strokeWidth: 5,
+              fillColor: Colors.red.shade100,
+              onTap: () {}),
         );
+
         conta = conta + 1;
       }
-      // print(_polygonSet.first.);
+
       return _polygonSet;
     }
 
     GoogleMap mapa = GoogleMap(
       mapType: MapType.normal,
       // zoomControlsEnabled: false,
+
       polygons: _polygonSet,
       onTap: onTap,
       markers: markers,
@@ -294,198 +284,12 @@ class _Map1State extends State<Map1> {
 
                       data_predio_cordenada(coordsUTM).then(
                         (value) {
+                          modal_window modal = modal_window(context, size_word);
                           if (value.length == 0) {
                             //redondeo de cus
-                            showModalBottomSheet(
-                              backgroundColor: Colors.transparent,
-                              context: context,
-                              builder: (BuildContext context) {
-                                return Container(
-                                  decoration: const BoxDecoration(
-                                      color: Colors.white,
-                                      borderRadius: BorderRadius.all(
-                                          Radius.circular(20))),
-                                  height: 600,
-                                  child: Center(
-                                    child: ListView(
-                                      children: [
-                                        Column(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.center,
-                                          mainAxisSize: MainAxisSize.min,
-                                          children: <Widget>[
-                                            Container(
-                                              padding:
-                                                  const EdgeInsetsDirectional
-                                                          .only(
-                                                      bottom: 10, top: 10),
-                                              child: const Text(
-                                                "No se encontraron datos",
-                                                style: TextStyle(
-                                                  fontWeight: FontWeight.bold,
-                                                  fontSize: 25,
-                                                ),
-                                              ),
-                                            ),
-                                          ],
-                                        )
-                                      ],
-                                    ),
-                                  ),
-                                );
-                              },
-                            );
+                            modal.venta_modal_error();
                           } else {
-                            List<Widget> usos_permitidos_list = [];
-                            List<Widget> usos_no_permitidos_list = [];
-                            String inStringCus =
-                                value[0]["cus"].toStringAsFixed(2); // '2.35'
-                            double inDoubleCus = double.parse(inStringCus);
-
-                            var usos_permitidos = value[0]
-                                ["zonificacion_default"]["usos_permitidos"];
-                            var usos_no_permitidos = value[0]
-                                ["zonificacion_default"]["usos_condicionados"];
-
-                            for (var tipo_uso in usos_permitidos) {
-                              String? tipo_uso_string =
-                                  tipos_uso_nombre[tipo_uso];
-                              var texto = Container(
-                                padding: const EdgeInsetsDirectional.only(
-                                    start: 10, top: 5),
-                                height: 30,
-                                width: device_data.size.width - 50,
-                                color: const Color(0xff39B339),
-                                child: Text(
-                                  "$tipo_uso - ${tipo_uso_string!}",
-                                  style: const TextStyle(fontSize: 15),
-                                  textAlign: TextAlign.left,
-                                ),
-                              );
-
-                              usos_permitidos_list.add(texto);
-                            }
-                            for (var tipo_uso_no in usos_no_permitidos) {
-                              String? tipo_uso_no_string =
-                                  tipos_uso_nombre[tipo_uso_no];
-                              var texto = Container(
-                                padding: const EdgeInsetsDirectional.only(
-                                    start: 10, top: 5, bottom: 10),
-                                height: 30,
-                                width: device_data.size.width - 50,
-                                color: const Color(0xff39B339),
-                                child: Text(
-                                  tipo_uso_no + " - " + tipo_uso_no_string!,
-                                  style: const TextStyle(fontSize: 15),
-                                  textAlign: TextAlign.left,
-                                ),
-                              );
-
-                              usos_no_permitidos_list.add(texto);
-                            }
-
-                            showModalBottomSheet(
-                              backgroundColor: Colors.transparent,
-                              context: context,
-                              builder: (BuildContext context) {
-                                return Container(
-                                  decoration: const BoxDecoration(
-                                      color: Colors.white,
-                                      borderRadius: BorderRadius.all(
-                                          Radius.circular(20))),
-                                  height: 600,
-                                  child: Center(
-                                    child: ListView(
-                                      children: [
-                                        Column(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.center,
-                                          mainAxisSize: MainAxisSize.min,
-                                          children: <Widget>[
-                                            Container(
-                                              padding:
-                                                  const EdgeInsetsDirectional
-                                                          .only(
-                                                      bottom: 10, top: 10),
-                                              child: const Text(
-                                                "Datos del lugar",
-                                                style: TextStyle(
-                                                  fontWeight: FontWeight.bold,
-                                                  fontSize: 25,
-                                                ),
-                                              ),
-                                            ),
-                                            info_total(
-                                                "Clave Catastral: ${value[0]["clave"]}"),
-                                            info_total(
-                                                "Tipo: ${value[0]["tipo"]}"),
-                                            info_total(
-                                                "Ubicacion:  ${value[0]["ubicacion"]}"),
-                                            info_total(
-                                                "Colonia: ${value[0]["colonia"]}"),
-                                            info_total(
-                                                "Clave Catastral: ${value[0]["clave"]}"),
-                                            info_total(
-                                                "Superficie de Terreno: Escritura ${value[0]["superficieLegal"].toString()} m2"),
-                                            info_total(
-                                                "Superficie de Terreno: Cartografía ${value[0]["superficieCarto"].toStringAsFixed(2)} m2"),
-                                            info_total(
-                                                "Superficie Construida: ${value[0]["superficieConstruccion"].toString()} m2"),
-                                            info_total(
-                                                "Frente de Predio: ${value[0]["frente"].toString()} m"),
-                                            info_total(
-                                                "Zonificacion: ${value[0]["clave"].toString()}"),
-                                            info_total(
-                                                "COS: ${value[0]["cos"].toStringAsFixed(2)}"),
-                                            info_total(
-                                                "COS:  ${value[0]["zonificacion_default"]["cos"].toString()} 0"),
-                                            info_total(
-                                                "CUS: ${inDoubleCus.toString()}"),
-                                            info_total(
-                                                "CUS permitido:  ${value[0]["zonificacion_default"]["cus_max"].toString()}"),
-                                          ],
-                                        ),
-                                        const Divider(),
-                                        Container(
-                                          padding:
-                                              const EdgeInsetsDirectional.only(
-                                                  bottom: 10),
-                                          child: const Text(
-                                            'Usos Permitidos',
-                                            style: TextStyle(
-                                              fontWeight: FontWeight.bold,
-                                              fontSize: 25,
-                                            ),
-                                            textAlign: TextAlign.center,
-                                          ),
-                                        ),
-                                        Column(
-                                            children: usos_permitidos_list,
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.spaceAround),
-                                        const Divider(),
-                                        Container(
-                                          padding:
-                                              const EdgeInsetsDirectional.only(
-                                                  bottom: 10),
-                                          child: const Text(
-                                            'Usos Condicionados',
-                                            style: TextStyle(
-                                              fontWeight: FontWeight.bold,
-                                              fontSize: 25,
-                                            ),
-                                            textAlign: TextAlign.center,
-                                          ),
-                                        ),
-                                        Column(
-                                            children: usos_no_permitidos_list),
-                                        const Divider()
-                                      ],
-                                    ),
-                                  ),
-                                );
-                              },
-                            );
+                            modal.venta_modal_info(value, device_data);
                           }
                         },
                       );
@@ -540,24 +344,12 @@ class _Map1State extends State<Map1> {
     }
   }
 
-  Widget info_total(data) {
-    return Container(
-      padding: const EdgeInsetsDirectional.only(bottom: 5),
-      child: Text(
-        data,
-        style: TextStyle(fontSize: size_word),
-      ),
-    );
-  }
+  
 
   List<LatLng> geometry_data(List data) {
     var data_geometry = data;
     List<LatLng> polygonCoords = [];
 
-    print(data.length);
-    print("===========================================================");
-    print(data[0]);
-    print(data[0].runtimeType);
     var new_list = data[0].replaceAll(" ", "").split(",");
 
     while (new_list.isNotEmpty) {
