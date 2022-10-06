@@ -25,8 +25,7 @@ class MySQLConnector {
     );
     print('CONENCTANDO A BASE DE DATOS');
     await connector.connect();
-    print(
-        'Conexión exitosa a la base de datos');
+    print('Conexión exitosa a la base de datos');
   }
 
   static void prueba() {
@@ -37,6 +36,7 @@ class MySQLConnector {
   static Future<List> getData(CP) async {
     List geometry_list = [];
     List aux = [];
+    print('____________________________________CODIGO POSTAL ${CP}');
     var result = await connector.execute(
         // "SELECT * FROM agebs where region=5 ",
         "select agebs.geometry from agebs  where agebs.codigoPostal= :CP",

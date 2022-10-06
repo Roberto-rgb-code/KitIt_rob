@@ -97,14 +97,13 @@ class _Map1State extends State<Map1> {
     }
 
     Set<Polygon> myPolygon(List lista_geometry) {
-   
       print("lista que viene de DB -----------------------------");
       print(lista_geometry.length);
       int conta = 0;
       var aux;
       for (List lista in lista_geometry) {
-        print("lista en for each ------------------------");
-        print(lista);
+        // print("lista en for each ------------------------");
+        // print(lista);
         List<LatLng> polygonCoords = geometry_data(lista);
 
         _polygonSet.add(
@@ -190,48 +189,51 @@ class _Map1State extends State<Map1> {
                         onPressed: () async {
                           // print('ENTRE AL ZOOM');
 
-                          print('Direccion: ');
-                          print(direccion.value);
+                          if (_textLugar.text == '') {
+                            ScaffoldMessenger.of(context)
+                                .showSnackBar(const SnackBar(content: Text('Escribe una direccion por favor')));
+                          } else {
+                            print('Direccion: ');
+                            print(direccion.value);
 
-                          final locations = await getLocation();
+                            final locations = await getLocation();
 
-                          LatLng latLngPosition = LatLng(
-                              locations[0].latitude, locations[0].longitude);
+                            LatLng latLngPosition = LatLng(
+                                locations[0].latitude, locations[0].longitude);
 
-                          List<Placemark> placemarks =
-                              await placemarkFromCoordinates(
-                                  latLngPosition.latitude,
-                                  latLngPosition.longitude);
-                          //placemarks[0].postalCode
-                          final resultados = await MySQLConnector.getData(
-                              placemarks[0].postalCode);
+                            List<Placemark> placemarks =
+                                await placemarkFromCoordinates(
+                                    latLngPosition.latitude,
+                                    latLngPosition.longitude);
+                            //placemarks[0].postalCode
+                            final resultados = await MySQLConnector.getData(
+                                placemarks[0].postalCode);
 
-                          setState(() {
-                            myPolygon(resultados);
-                            postionOnTap = latLngPosition;
-                            if (contador == 0) {
-                              contador += 1;
+                            setState(() {
+                              myPolygon(resultados);
+                              postionOnTap = latLngPosition;
+                              if (contador == 0) {
+                                contador += 1;
 
-                              final id = _markers.length.toString();
-                              final markerId = MarkerId(id);
+                                final id = _markers.length.toString();
+                                final markerId = MarkerId(id);
 
-                              final marker = Marker(
-                                icon: BitmapDescriptor.defaultMarkerWithHue(
-                                    BitmapDescriptor.hueAzure),
-                                markerId: markerId,
-                                position: latLngPosition,
-                                anchor: const Offset(0.5, 1),
-                                onTap: () {
-                                  _markersController.sink.add(id);
-                                  latlon1 = latLngPosition;
-                                },
-                              );
+                                final marker = Marker(
+                                  icon: BitmapDescriptor.defaultMarkerWithHue(
+                                      BitmapDescriptor.hueAzure),
+                                  markerId: markerId,
+                                  position: latLngPosition,
+                                  anchor: const Offset(0.5, 1),
+                                  onTap: () {
+                                    _markersController.sink.add(id);
+                                    latlon1 = latLngPosition;
+                                  },
+                                );
 
-                              _markers[markerId] = marker;
-                            }
-
-                            // });
-                          });
+                                _markers[markerId] = marker;
+                              }
+                            });
+                          }
                         },
                         child: const Icon(Icons.search))
                   ],
@@ -343,8 +345,6 @@ class _Map1State extends State<Map1> {
       });
     }
   }
-
-  
 
   List<LatLng> geometry_data(List data) {
     var data_geometry = data;
