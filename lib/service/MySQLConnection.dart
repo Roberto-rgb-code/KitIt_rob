@@ -17,7 +17,7 @@ class MySQLConnector {
 
   static void connection() async {
     connector = await MySQLConnection.createConnection(
-      host: "192.168.100.247",
+      host: "192.168.100.249",
       port: 3306,
       userName: "kikit2",
       password: "polloasado1",
@@ -25,7 +25,7 @@ class MySQLConnector {
     );
     print('CONENCTANDO A BASE DE DATOS');
     await connector.connect();
-    print('Conexión exitosa a la base de datos');
+    print('Conexión exitosa a la base de datos____________________________________________________');
   }
 
   static void prueba() {
@@ -61,8 +61,8 @@ class MySQLConnector {
       };
       demografic_data.add(map);
     }
-    print(agebs);
-    print(demografic_data);
+    // print(agebs);
+    // print(demografic_data);
     return [agebs, geometry_list, demografic_data];
   }
 }
