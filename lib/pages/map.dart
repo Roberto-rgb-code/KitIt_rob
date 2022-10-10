@@ -97,27 +97,33 @@ class _Map1State extends State<Map1> {
       });
     }
 
-    Set<Polygon> myPolygon(List lista_geometry) {
+    Set<Polygon> myPolygon(
+      List lista_geometry,
+    ) {
       print("lista que viene de DB -----------------------------");
       print(lista_geometry.length);
       int conta = 0;
       var aux;
-      for (List lista in lista_geometry) {
+
+      List hola = [];
+
+      for (var i = 0; i < lista_geometry.length; i++) {
         // print("lista en for each ------------------------");
         // print(lista);
-        List<LatLng> polygonCoords = geometry_data(lista);
-
+        List<LatLng> polygonCoords = geometry_data(lista_geometry[i]);
+        hola.add(conta);
         _polygonSet.add(
           Polygon(
               polygonId: PolygonId('test $conta'),
               points: polygonCoords,
               consumeTapEvents: true,
-              zIndex: 1,
+              zIndex: 100000,
               strokeColor: Colors.red.shade600,
               strokeWidth: 5,
               fillColor: Colors.red.shade100,
-              
-              onTap: () {}),
+              onTap: () {
+                print('Hola menso ${hola[i]}');
+              }),
         );
 
         conta = conta + 1;
@@ -131,7 +137,7 @@ class _Map1State extends State<Map1> {
       zoomControlsEnabled: false,
       polygons: _polygonSet,
       onTap: onTap,
-      markers: markers,
+      // markers: markers,
       initialCameraPosition: _kGooglePlex,
       onMapCreated: (GoogleMapController controller) {
         _controller.complete(controller);
@@ -217,6 +223,7 @@ class _Map1State extends State<Map1> {
 
                             setState(() {
                               myPolygon(resultados);
+
                               postionOnTap = latLngPosition;
                               if (contador == 0) {
                                 contador += 1;
