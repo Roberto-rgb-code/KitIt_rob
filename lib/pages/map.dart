@@ -137,7 +137,7 @@ class _Map1State extends State<Map1> {
       zoomControlsEnabled: false,
       polygons: _polygonSet,
       onTap: onTap,
-      // markers: markers,
+      //markers: markers,
       initialCameraPosition: _kGooglePlex,
       onMapCreated: (GoogleMapController controller) {
         _controller.complete(controller);
