@@ -1,16 +1,17 @@
 import 'dart:collection';
+import 'dart:ffi';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_speed_dial/flutter_speed_dial.dart';
 import 'dart:async';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:kitit/assets/colors.dart';
 import 'package:kitit/resourses/exceReader.dart';
 import 'package:kitit/service/MySQLConnection.dart';
 import 'package:kitit/service/datos_predios.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:geocoding/geocoding.dart' as geo;
 import 'package:kitit/widgets/modal_window.dart';
-
-import '../widgets/drawer.dart';
 
 class Map1 extends StatefulWidget {
   Map1({Key? key}) : super(key: key);
@@ -115,6 +116,7 @@ class _Map1State extends State<Map1> {
               strokeColor: Colors.red.shade600,
               strokeWidth: 5,
               fillColor: Colors.red.shade100,
+              
               onTap: () {}),
         );
 
@@ -126,8 +128,7 @@ class _Map1State extends State<Map1> {
 
     GoogleMap mapa = GoogleMap(
       mapType: MapType.normal,
-      // zoomControlsEnabled: false,
-
+      zoomControlsEnabled: false,
       polygons: _polygonSet,
       onTap: onTap,
       markers: markers,
@@ -147,7 +148,6 @@ class _Map1State extends State<Map1> {
     }
 
     return Scaffold(
-      drawer: const DrawerWidget(),
       body: Center(
         child: SingleChildScrollView(
           child: Stack(
@@ -177,7 +177,9 @@ class _Map1State extends State<Map1> {
                           print(direccion.value);
                         },
                         decoration: const InputDecoration(
+                            hoverColor: Colors.black,
                             labelText: "Ingrese su direccion",
+                            labelStyle: TextStyle(color: Colors.black),
                             border: OutlineInputBorder(
                                 borderSide: BorderSide(
                                     style: BorderStyle.none, width: 0),
@@ -186,12 +188,16 @@ class _Map1State extends State<Map1> {
                       ),
                     ),
                     ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                            primary: DesingColors.dark),
                         onPressed: () async {
                           // print('ENTRE AL ZOOM');
 
                           if (_textLugar.text == '') {
-                            ScaffoldMessenger.of(context)
-                                .showSnackBar(const SnackBar(content: Text('Escribe una direccion por favor')));
+                            ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(
+                                    content: Text(
+                                        'Escribe o selecciona una zona por favor')));
                           } else {
                             print('Direccion: ');
                             print(direccion.value);
@@ -235,7 +241,10 @@ class _Map1State extends State<Map1> {
                             });
                           }
                         },
-                        child: const Icon(Icons.search))
+                        child: const Icon(
+                          Icons.search_rounded,
+                          // color: DesingColors.yellow,
+                        ))
                   ],
                 ),
               ),
@@ -244,11 +253,12 @@ class _Map1State extends State<Map1> {
         ),
       ),
       floatingActionButton: Container(
-        padding: const EdgeInsetsDirectional.only(start: 20),
+        width: device_data.size.width - 30,
         child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceAround,
+          mainAxisAlignment: MainAxisAlignment.center,
           children: [
             FloatingActionButton(
+              backgroundColor: DesingColors.dark,
               onPressed: () {
                 _polygonSet.clear();
                 _textLugar.clear();
@@ -258,45 +268,64 @@ class _Map1State extends State<Map1> {
                   contador = 0;
                 });
               },
-              child: const Icon(Icons.delete),
+              child: const Icon(Icons.delete_rounded),
             ),
-            const Divider(height: 50),
+            SizedBox(
+              width: device_data.size.width * 0.6,
+            ),
             Builder(
               builder: (context) {
                 if (contador == 0) {
-                  return const FloatingActionButton(
-                    onPressed: null,
-                    backgroundColor: Colors.grey,
-                    child: Icon(Icons.remove_red_eye),
+                  return FloatingActionButton(
+                    onPressed: () {
+                      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+                          content:
+                              Text('Escribe o selecciona una zona por favor')));
+                    },
+                    backgroundColor: DesingColors.bottonDisable,
+                    child: Icon(Icons.do_disturb_alt_outlined),
                   );
                 } else {
-                  return FloatingActionButton(
-                    child: const Icon(Icons.remove_red_eye),
-                    onPressed: () async {
-                      print('Posicion colocada:::::::::::::::::::: ');
-                      print(postionOnTap!.latitude);
-                      print(postionOnTap!.longitude);
-
-                      List<double> coordsUTM =
-                          await ExcelReader.modifyLatAndLon(
-                              postionOnTap!.latitude, postionOnTap!.longitude);
-
-                      print('CORDENADAS UTM AAAAAAAAAAAAAAAAAAA');
-                      print(coordsUTM);
-
-                      data_predio_cordenada(coordsUTM).then(
-                        (value) {
-                          modal_window modal = modal_window(context, size_word);
-                          if (value.length == 0) {
-                            //redondeo de cus
-                            modal.venta_modal_error();
-                          } else {
-                            modal.venta_modal_info(value, device_data);
-                          }
-                        },
-                      );
-                    },
+                  return SpeedDial(
+                    overlayOpacity: 0,
+                    renderOverlay: false,
+                    backgroundColor: DesingColors.dark,
+                    animatedIcon: AnimatedIcons.menu_close,
+                    spaceBetweenChildren: 10,
+                    children: [
+                      SpeedDialChild(
+                          backgroundColor: DesingColors.yellow,
+                          child: const Icon(Icons.family_restroom_rounded)),
+                      SpeedDialChild(
+                          backgroundColor: DesingColors.yellow,
+                          child: const Icon(Icons.gavel_rounded)),
+                      SpeedDialChild(
+                          backgroundColor: DesingColors.yellow,
+                          child: const Icon(Icons.route_rounded)),
+                    ],
                   );
+
+                  // FloatingActionButton(
+                  //   child: const Icon(Icons.menu),
+                  //   onPressed: () async {
+
+                  //     List<double> coordsUTM =
+                  //         await ExcelReader.modifyLatAndLon(
+                  //             postionOnTap!.latitude, postionOnTap!.longitude);
+
+                  //     data_predio_cordenada(coordsUTM).then(
+                  //       (value) {
+                  //         modal_window modal = modal_window(context, size_word);
+                  //         if (value.length == 0) {
+                  //           modal.venta_modal_error();
+                  //         } else {
+                  //           modal.venta_modal_info(value, device_data);
+                  //         }
+                  //       },
+                  //     );
+                  //   },
+                  // );
+
                 }
               },
             )
