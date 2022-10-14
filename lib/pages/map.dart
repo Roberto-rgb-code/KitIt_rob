@@ -98,6 +98,83 @@ class _Map1State extends State<Map1> {
       });
     }
 
+    getLocation() async {
+      List<Location> locations =
+          await locationFromAddress("${_textLugar.text}, Guadalajara, Jal.");
+
+      // await locationFromAddress("Jesus garcia 3020, Guadalajara, Jal.");
+
+      return locations;
+    }
+
+    void onTap(LatLng position) async {
+      List<Placemark> placemarks =
+          await placemarkFromCoordinates(position.latitude, position.longitude);
+
+      print('ESTAS TAPEANDO EL MAPA');
+      final resultados = await MySQLConnector.getData(placemarks[0].postalCode);
+
+      if (!hasPaintedAZone) {
+        print(
+            'PINTANDO POLIGONOS______________________________________________________________________');
+        setState(() {
+          hasPaintedAZone = true;
+          myPolygon(resultados);
+        });
+      }
+
+      if (hammerIsTaped) {
+        print('ESTAS TAPEANDO EL MAPA CON EL MARTILLO');
+        setState(()  {
+          postionOnTap = position;
+          // _textLugar.text = transformAddress(placemarks[0].street!);
+
+          String id = 'hammerMaker';
+          final markerId = MarkerId(id);
+
+          final marker = Marker(
+            icon: BitmapDescriptor.defaultMarkerWithHue(
+                BitmapDescriptor.hueAzure),
+            markerId: markerId,
+            position: position,
+            zIndex: 2,
+            anchor: const Offset(0.5, 1),
+            onTap: () {
+              _markersController.sink.add(id);
+              latlon1 = position;
+            },
+            draggable: true,
+            onDragEnd: (newPosition) {
+              //print("el marcador se puso en las longitudes $newPosition");
+              print("latitud ");
+
+              position = newPosition;
+            },
+          );
+
+          _markers[markerId] = marker;
+
+          // data_predio_cordenada([position.]);
+        });
+          //AQUI ES DONDE LLAMAREMOS LA VENTANA MODAL  
+        modal_window modal = modal_window(context, 17);
+
+          List<double> coordsUTM = await ExcelReader.modifyLatAndLon(
+              position.latitude, position.longitude);
+
+          final response = await data_predio_cordenada(coordsUTM);
+
+          bool band_venta = true;
+          if (response.length == 0) {
+            band_venta = false;
+          }
+          modal.venta_modal_info(response, device_data, band_venta);
+
+      }
+
+      // POR SI QUIERES ALGUN OTRO IF
+    }
+
     GoogleMap mapa = GoogleMap(
       mapType: MapType.normal,
       // zoomControlsEnabled: false,
@@ -109,15 +186,6 @@ class _Map1State extends State<Map1> {
         _controller.complete(controller);
       },
     );
-
-    getLocation() async {
-      List<Location> locations =
-          await locationFromAddress("${_textLugar.text}, Guadalajara, Jal.");
-
-      // await locationFromAddress("Jesus garcia 3020, Guadalajara, Jal.");
-
-      return locations;
-    }
 
     return Scaffold(
       body: Center(
@@ -282,11 +350,6 @@ class _Map1State extends State<Map1> {
                                 _markers.remove(const MarkerId('hammerMaker'));
                               }
                               hammerIsTaped = !hammerIsTaped;
-
-                              print(
-                                  'CAMBIO EL MARTILLO A TRUE____________ ${hammerIsTaped}');
-                              // print(
-                              //     'CAMBIO EL MARTILLO A TRUE____________ ${disableOnTapPolygon.value}');
                             });
                           },
                           child: const Icon(Icons.gavel_rounded)),
@@ -324,58 +387,6 @@ class _Map1State extends State<Map1> {
         ),
       ),
     );
-  }
-
-  void onTap(LatLng position) async {
-    List<Placemark> placemarks =
-        await placemarkFromCoordinates(position.latitude, position.longitude);
-
-    print('ESTAS TAPEANDO EL MAPA');
-    final resultados = await MySQLConnector.getData(placemarks[0].postalCode);
-
-    if (!hasPaintedAZone) {
-      print('PINTANDO POLIGONOS______________________________________________________________________');
-      setState(() {
-        hasPaintedAZone = true;
-        myPolygon(resultados);
-      });
-
-    }
-
-    if (hammerIsTaped) {
-      print('ESTAS TAPEANDO EL MAPA CON EL MARTILLO');
-      setState(() {
-        postionOnTap = position;
-        // _textLugar.text = transformAddress(placemarks[0].street!);
-
-        String id = 'hammerMaker';
-        final markerId = MarkerId(id);
-
-        final marker = Marker(
-          icon:
-              BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueAzure),
-          markerId: markerId,
-          position: position,
-          zIndex: 2,
-          anchor: const Offset(0.5, 1),
-          onTap: () {
-            _markersController.sink.add(id);
-            latlon1 = position;
-          },
-          draggable: true,
-          onDragEnd: (newPosition) {
-            //print("el marcador se puso en las longitudes $newPosition");
-            print("latitud ");
-
-            position = newPosition;
-
-            print("POSI EN LA QUE PUSISTE EL MARCADOR WEY $position");
-          },
-        );
-
-        _markers[markerId] = marker;
-      });
-    }
   }
 
   Set<Polygon> myPolygon(
