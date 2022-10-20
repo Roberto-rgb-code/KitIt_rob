@@ -11,6 +11,7 @@ import 'package:kitit/assets/ColorPolygon.dart';
 import 'package:kitit/assets/colors.dart';
 import 'package:kitit/providers/polygons_data.dart';
 import 'package:kitit/resourses/exceReader.dart';
+import 'package:kitit/service/DENUE_data.dart';
 import 'package:kitit/service/MySQLConnection.dart';
 import 'package:kitit/service/datos_predios.dart';
 import 'package:geocoding/geocoding.dart';
@@ -300,6 +301,21 @@ class _Map1State extends State<Map1> {
                 ],
               ),
             ),
+            // Container(
+            //   margin: EdgeInsets.only(top: 50),
+            //   child: FloatingActionButton(
+            //     backgroundColor: DesingColors.dark,
+            //     onPressed: () async {
+            //       _polygonSet.clear();
+            //       _textLugar.clear();
+
+            //       var denue_data = await datosDenue.fetchPost("restaurante",
+            //           "20.682323236235217", "-103.3503290595878");
+            //       print(denue_data);
+            //     },
+            //     child: const Icon(Icons.abc),
+            //   ),
+            // ),
             Builder(builder: (context) {
               print(window_visiviliti);
               if (window_visiviliti == true) {
