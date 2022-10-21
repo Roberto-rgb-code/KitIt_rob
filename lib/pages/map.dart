@@ -43,6 +43,7 @@ class _Map1State extends State<Map1> {
   Stream<String> get onMarkerTap => _markersController.stream;
   @override
   final TextEditingController _textLugar = TextEditingController();
+  final TextEditingController _textActividadEconomica = TextEditingController();
   Completer<GoogleMapController> _controller = Completer();
   bool hammerIsTaped = false;
   bool hasPaintedAZone = false;
@@ -54,6 +55,7 @@ class _Map1State extends State<Map1> {
   );
 
   ValueNotifier<String> direccion = ValueNotifier<String>('');
+  ValueNotifier<String> actividadEconomica = ValueNotifier<String>('');
 
   @override
   Widget build(BuildContext context) {
@@ -192,209 +194,255 @@ class _Map1State extends State<Map1> {
       },
     );
 
-    return Scaffold(
-      body: Center(
-        child: Stack(
-          children: [
-            Center(
-              child: Container(
-                width: device_data.size.width,
-                height: device_data.size.height,
-                child: mapa,
+    return SafeArea(
+      child: Scaffold(
+        body: Center(
+          child: Stack(
+            children: [
+              Center(
+                child: Container(
+                  width: device_data.size.width,
+                  height: device_data.size.height,
+                  child: mapa,
+                ),
               ),
-            ),
-            CustomInfoWindow(
-              controller: _customInfoWindowController,
-              height: 180,
-              width: 200,
-              offset: 80,
-            ),
-            Container(
-              padding: const EdgeInsets.only(top: 7),
-              decoration: const BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.all(Radius.circular(5))),
-              margin: const EdgeInsets.only(top: 70, left: 10, right: 10),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: [
-                  SizedBox(
-                    width: device_data.size.width * 0.7,
-                    child: TextField(
-                      controller: _textLugar,
-                      onChanged: (value) {
-                        direccion.value = value;
-                        print(direccion.value);
-                      },
-                      decoration: const InputDecoration(
-                          hoverColor: Colors.black,
-                          labelText: "Ingrese su direccion",
-                          labelStyle: TextStyle(color: Colors.black),
-                          border: OutlineInputBorder(
-                              borderSide:
-                                  BorderSide(style: BorderStyle.none, width: 0),
-                              borderRadius:
-                                  BorderRadius.all(Radius.circular(5.0)))),
+              CustomInfoWindow(
+                controller: _customInfoWindowController,
+                height: 180,
+                width: 200,
+                offset: 80,
+              ),
+              Container(
+                padding: const EdgeInsets.only(top: 7),
+                decoration: const BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.all(Radius.circular(5))),
+                margin: const EdgeInsets.only(top: 20, left: 10, right: 10),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    SizedBox(
+                      width: device_data.size.width * 0.7,
+                      child: TextField(
+                        controller: _textLugar,
+                        onChanged: (value) {
+                          direccion.value = value;
+                        },
+                        decoration: const InputDecoration(
+                            hoverColor: Colors.black,
+                            labelText: "Ingrese su direccion",
+                            labelStyle: TextStyle(color: Colors.black),
+                            border: OutlineInputBorder(
+                                borderSide: BorderSide(
+                                    style: BorderStyle.none, width: 0),
+                                borderRadius:
+                                    BorderRadius.all(Radius.circular(5.0)))),
+                      ),
                     ),
-                  ),
-                  ElevatedButton(
-                    style: ElevatedButton.styleFrom(primary: DesingColors.dark),
-                    onPressed: () async {
-                      // print('ENTRE AL ZOOM');
+                    ElevatedButton(
+                      style:
+                          ElevatedButton.styleFrom(primary: DesingColors.dark),
+                      onPressed: () async {
+                        // print('ENTRE AL ZOOM');
 
-                      if (_textLugar.text == '') {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(
-                                content: Text(
-                                    'Escribe o selecciona una zona por favor')));
-                      } else {
-                        print('Direccion: ');
-                        print(direccion.value);
+                        if (_textLugar.text == '') {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                  content: Text(
+                                      'Escribe o selecciona una zona por favor')));
+                        } else {
+                          print('Direccion: ');
+                          print(direccion.value);
 
-                        final locations = await getLocation();
+                          final locations = await getLocation();
 
-                        LatLng latLngPosition = LatLng(
-                            locations[0].latitude, locations[0].longitude);
+                          LatLng latLngPosition = LatLng(
+                              locations[0].latitude, locations[0].longitude);
 
-                        List<Placemark> placemarks =
-                            await placemarkFromCoordinates(
-                                latLngPosition.latitude,
-                                latLngPosition.longitude);
+                          List<Placemark> placemarks =
+                              await placemarkFromCoordinates(
+                                  latLngPosition.latitude,
+                                  latLngPosition.longitude);
 
-                        final resultados = await MySQLConnector.getData(
-                            placemarks[0].postalCode);
+                          final resultados = await MySQLConnector.getData(
+                              placemarks[0].postalCode);
+
+                          setState(() {
+                            print('PINTAR LA ZONA_______________');
+
+                            hasPaintedAZone = true;
+
+                            myPolygon(resultados);
+
+                            postionOnTap = latLngPosition;
+                          });
+                        }
+                      },
+                      child: const Icon(
+                        Icons.search_rounded,
+                        // color: DesingColors.yellow,
+                      ),
+                    )
+                  ],
+                ),
+              ),
+              Builder(builder: (context) {
+                print(window_visiviliti);
+                if (window_visiviliti == true) {
+                  return Container(
+                    margin: EdgeInsets.only(
+                        top: device_data.size.height - 690,
+                        left: device_data.size.width - 65),
+                    child: FloatingActionButton(
+                      backgroundColor: DesingColors.dark,
+                      onPressed: () {
+                        Set<Polygon> _polygonSet_auxiliar = new Set();
+
+                        var tam_polygon_Set = _polygonSet.length;
+                        var contador = 0;
+                        for (var element in _polygonSet) {
+                          if (contador < tam_polygon_Set - 1) {
+                            _polygonSet_auxiliar.add(element.clone());
+                          }
+                          contador++;
+                        }
 
                         setState(() {
-                          print('PINTAR LA ZONA_______________');
+                          _customInfoWindowController.hideInfoWindow!();
+                          _polygonSet.clear();
+                          _polygonSet.addAll(_polygonSet_auxiliar);
 
-                          hasPaintedAZone = true;
-
-                          myPolygon(resultados);
-
-                          postionOnTap = latLngPosition;
+                          window_visiviliti = false;
                         });
-                      }
-                    },
-                    child: const Icon(
-                      Icons.search_rounded,
-                      // color: DesingColors.yellow,
+                      },
+                      child:
+                          const Icon(Icons.visibility_off, color: Colors.white),
                     ),
-                  )
-                ],
-              ),
-            ),
-            Builder(builder: (context) {
-              print(window_visiviliti);
-              if (window_visiviliti == true) {
-                return Container(
-                  margin: EdgeInsets.only(
-                      top: device_data.size.height - 690,
-                      left: device_data.size.width - 65),
-                  child: FloatingActionButton(
-                    backgroundColor: DesingColors.dark,
-                    onPressed: () {
-                      Set<Polygon> _polygonSet_auxiliar = new Set();
-
-                      var tam_polygon_Set = _polygonSet.length;
-                      var contador = 0;
-                      for (var element in _polygonSet) {
-                        if (contador < tam_polygon_Set - 1) {
-                          _polygonSet_auxiliar.add(element.clone());
-                        }
-                        contador++;
-                      }
-
-                      setState(() {
-                        _customInfoWindowController.hideInfoWindow!();
-                        _polygonSet.clear();
-                        _polygonSet.addAll(_polygonSet_auxiliar);
-
-                        window_visiviliti = false;
-                      });
-                    },
-                    child:
-                        const Icon(Icons.visibility_off, color: Colors.white),
-                  ),
-                );
-              } else {
-                return SizedBox();
-              }
-            })
-          ],
-        ),
-      ),
-      floatingActionButton: Container(
-        width: device_data.size.width - 30,
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            FloatingActionButton(
-              backgroundColor: DesingColors.dark,
-              onPressed: () {
-                _polygonSet.clear();
-                _textLugar.clear();
-
-                setState(() {
-                  _markers.clear();
-                  hasPaintedAZone = false;
-                  hammerIsTaped = false;
-                });
-              },
-              child: const Icon(Icons.delete_rounded),
-            ),
-            SizedBox(
-              width: device_data.size.width * 0.6,
-            ),
-            Builder(
-              builder: (context) {
-                if (hasPaintedAZone == false) {
-                  return FloatingActionButton(
-                    onPressed: () {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                          content:
-                              Text('Escribe o selecciona una zona por favor'),
-                        ),
-                      );
-                    },
-                    backgroundColor: DesingColors.bottonDisable,
-                    child: const Icon(Icons.do_disturb_alt_outlined),
                   );
                 } else {
-                  return SpeedDial(
-                    overlayOpacity: 0,
-                    renderOverlay: false,
-                    backgroundColor: DesingColors.dark,
-                    animatedIcon: AnimatedIcons.menu_close,
-                    spaceBetweenChildren: 10,
-                    children: [
-                      SpeedDialChild(
-                          backgroundColor: DesingColors.yellow,
-                          child: const Icon(Icons.family_restroom_rounded)),
-                      SpeedDialChild(
-                          backgroundColor: DesingColors.yellow,
-                          onTap: () {
-                            setState(
-                              () {
-                                if (hammerIsTaped) {
-                                  _markers
-                                      .remove(const MarkerId('hammerMaker'));
-                                }
-                                hammerIsTaped = !hammerIsTaped;
-                              },
-                            );
-                          },
-                          child: const Icon(Icons.gavel_rounded)),
-                      SpeedDialChild(
-                        backgroundColor: DesingColors.yellow,
-                        child: const Icon(Icons.route_rounded),
-                      ),
-                    ],
-                  );
+                  return SizedBox();
                 }
-              },
-            )
-          ],
+              })
+            ],
+          ),
+        ),
+        floatingActionButton: Container(
+          width: device_data.size.width - 30,
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              FloatingActionButton(
+                backgroundColor: DesingColors.dark,
+                onPressed: () {
+                  _polygonSet.clear();
+                  _textLugar.clear();
+
+                  setState(() {
+                    _customInfoWindowController.hideInfoWindow!();
+                    window_visiviliti = false;
+                    _markers.clear();
+                    hasPaintedAZone = false;
+                    hammerIsTaped = false;
+                  });
+                },
+                child: const Icon(Icons.delete_rounded),
+              ),
+              SizedBox(
+                width: device_data.size.width * 0.6,
+              ),
+              Builder(
+                builder: (context) {
+                  if (hasPaintedAZone == false) {
+                    return FloatingActionButton(
+                      onPressed: () {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            content:
+                                Text('Escribe o selecciona una zona por favor'),
+                          ),
+                        );
+                      },
+                      backgroundColor: DesingColors.bottonDisable,
+                      child: const Icon(Icons.do_disturb_alt_outlined),
+                    );
+                  } else {
+                    return SpeedDial(
+                      overlayOpacity: 0,
+                      renderOverlay: false,
+                      backgroundColor: DesingColors.dark,
+                      animatedIcon: AnimatedIcons.menu_close,
+                      spaceBetweenChildren: 10,
+                      children: [
+                        SpeedDialChild(
+                            backgroundColor: DesingColors.yellow,
+                            onTap: () {
+                              setState(
+                                () {
+                                  if (hammerIsTaped) {
+                                    _markers
+                                        .remove(const MarkerId('hammerMaker'));
+                                  }
+                                  hammerIsTaped = !hammerIsTaped;
+                                },
+                              );
+                            },
+                            child: const Icon(Icons.gavel_rounded)),
+                        SpeedDialChild(
+                          backgroundColor: DesingColors.yellow,
+                          child: const Icon(Icons.route_rounded),
+                        ),
+                        SpeedDialChild(
+                            backgroundColor: DesingColors.yellow,
+                            child: const Icon(Icons.storefront),
+                            onTap: () {
+                              bool buttonDisable = true;
+
+                              showDialog(
+                                  context: context,
+                                  builder: (context) => AlertDialog(
+                                        title: const Center(
+                                            child: Text(
+                                          'Escribe tu actividad economica',
+                                          style: TextStyle(fontSize: 18),
+                                        )),
+                                        /////////////////
+                                        content: Padding(
+                                          padding:
+                                              const EdgeInsets.only(top: 5),
+                                          child: TextField(
+                                              decoration: const InputDecoration(
+                                                  errorText: null,
+                                                  hintText:
+                                                      'Ejemplo: Abarrotes'),
+                                              controller:
+                                                  _textActividadEconomica,
+                                              onChanged: (value) {
+                                                actividadEconomica.value =
+                                                    value;
+                                                    
+                                              }),
+                                        ),
+                                        ////////////////
+                                        actions: [
+                                          Center(
+                                            child: ElevatedButton(
+                                                style: ElevatedButton.styleFrom(
+                                                    primary: DesingColors.dark),
+                                                onPressed: buttonDisable == true
+                                                    ? null
+                                                    : () {},
+                                                child: const Text('Siguiente')),
+                                          ),
+                                        ],
+                                      ));
+                            }),
+                      ],
+                    );
+                  }
+                },
+              )
+            ],
+          ),
         ),
       ),
     );
@@ -496,9 +544,9 @@ class _Map1State extends State<Map1> {
         points: polygonCoords,
         consumeTapEvents: false,
         zIndex: -1,
-        strokeColor: Colors.red.shade600,
+        strokeColor: ColorPolygon.borderColor2,
         strokeWidth: 5,
-        fillColor: Colors.red.shade100,
+        fillColor: ColorPolygon.filling2,
       );
 
       _polygonSetDisable.add(po2);
