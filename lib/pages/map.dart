@@ -11,6 +11,7 @@ import 'package:kitit/assets/ColorPolygon.dart';
 import 'package:kitit/assets/colors.dart';
 import 'package:kitit/providers/polygons_data.dart';
 import 'package:kitit/resourses/exceReader.dart';
+import 'package:kitit/service/DENUE_data.dart';
 import 'package:kitit/service/MySQLConnection.dart';
 import 'package:kitit/service/datos_predios.dart';
 import 'package:geocoding/geocoding.dart';
@@ -59,7 +60,7 @@ class _Map1State extends State<Map1> {
 
   @override
   Widget build(BuildContext context) {
-    var device_data = MediaQuery.of(context);
+    var deviceData = MediaQuery.of(context);
 
     Completer<GoogleMapController> _controller = Completer();
 
@@ -130,6 +131,7 @@ class _Map1State extends State<Map1> {
         print('ESTAS TAPEANDO EL MAPA CON EL MARTILLO');
         setState(() {
           postionOnTap = position;
+
           // _textLugar.text = transformAddress(placemarks[0].street!);
 
           String id = 'hammerMaker';
@@ -167,20 +169,34 @@ class _Map1State extends State<Map1> {
 
         final response = await data_predio_cordenada(coordsUTM);
 
-        bool band_venta = true;
+        bool bandVenta = true;
         if (response.length == 0) {
-          band_venta = false;
+          bandVenta = false;
         }
-        modal.venta_modal_info(response, device_data, band_venta);
+        modal.venta_modal_info(response, deviceData, bandVenta);
       }
 
       // POR SI QUIERES ALGUN OTRO IF
     }
 
+    Set<Polygon> paintPolygons() {
+      Set<Polygon> a = {};
+
+      if (hammerIsTaped == true) {
+        a.addAll(_polygonSetDisable);
+        return a;
+      } else {
+        a.addAll(_polygonSet);
+        return a;
+      }
+    }
+
     GoogleMap mapa = GoogleMap(
       mapType: MapType.normal,
       // zoomControlsEnabled: false,
-      polygons: hammerIsTaped == true ? _polygonSetDisable : _polygonSet,
+      // polygons: hammerIsTaped == true ? paintPolygons() : _polygonSet,
+
+      polygons: paintPolygons(),
       onTap: onTap,
       markers: markers,
       initialCameraPosition: _kGooglePlex,
@@ -193,6 +209,8 @@ class _Map1State extends State<Map1> {
         _customInfoWindowController.onCameraMove!();
       },
     );
+
+    var device_data = MediaQuery.of(context);
 
     return SafeArea(
       child: Scaffold(
@@ -419,7 +437,6 @@ class _Map1State extends State<Map1> {
                                               onChanged: (value) {
                                                 actividadEconomica.value =
                                                     value;
-                                                    
                                               }),
                                         ),
                                         ////////////////
@@ -449,7 +466,6 @@ class _Map1State extends State<Map1> {
   }
 
   void onTap(LatLng position) async {
-    _customInfoWindowController.hideInfoWindow!();
     List<Placemark> placemarks =
         await placemarkFromCoordinates(position.latitude, position.longitude);
 
@@ -502,21 +518,21 @@ class _Map1State extends State<Map1> {
   }
 
   Set<Polygon> myPolygon(
-    List lista_geometry,
+    List listaGeometry,
   ) {
     int conta = 0;
     var aux;
 
     List hola = [];
 
-    for (var i = 0; i < lista_geometry[1].length; i++) {
+    for (var i = 0; i < listaGeometry[1].length; i++) {
       List<LatLng> polygonCoords =
-          polygonsMetods().geometry_data(lista_geometry[1][i]);
+          polygonsMetods().geometry_data(listaGeometry[1][i]);
       hola.add(conta);
       var paa = PolygonId("a");
       Polygon po = Polygon(
         geodesic: true,
-        polygonId: PolygonId(lista_geometry[0][i]),
+        polygonId: PolygonId(listaGeometry[0][i]),
         points: polygonCoords,
         consumeTapEvents: true,
         zIndex: -1,
@@ -526,15 +542,17 @@ class _Map1State extends State<Map1> {
         onTap: () async {
           _customInfoWindowController.addInfoWindow!(
               window_map(
-                data: lista_geometry[2][i],
+                data: listaGeometry[2][i],
                 listaPolygons: _polygonSet,
               ),
               polygonCoords[0]);
 
-          setState(() {
-            window_visiviliti = true;
-            polygon_seleccion(lista_geometry[0][i]);
-          });
+          setState(
+            () {
+              window_visiviliti = true;
+              polygon_seleccion(listaGeometry[0][i]);
+            },
+          );
         },
       );
 
@@ -574,8 +592,11 @@ class _Map1State extends State<Map1> {
       strokeWidth: 5,
       fillColor: ColorPolygon.borderColor,
     );
-    setState(() {
-      _polygonSet.add(po);
-    });
+
+    setState(
+      () {
+        _polygonSet.add(po);
+      },
+    );
   }
 }
