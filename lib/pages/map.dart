@@ -5,22 +5,19 @@ import 'dart:io';
 import 'package:custom_info_window/custom_info_window.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_speed_dial/flutter_speed_dial.dart';
-import 'package:get/get.dart';
 import 'dart:async';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:kitit/assets/ColorPolygon.dart';
 import 'package:kitit/assets/colors.dart';
-import 'package:kitit/providers/polygons_data.dart';
 import 'package:kitit/resourses/exceReader.dart';
-import 'package:kitit/service/DENUE_data.dart';
 import 'package:kitit/service/MySQLConnection.dart';
 import 'package:kitit/service/datos_predios.dart';
 import 'package:geocoding/geocoding.dart';
-import 'package:geocoding/geocoding.dart' as geo;
 import 'package:kitit/widgets/modal_window.dart';
 import 'package:kitit/widgets/polygons_metods.dart';
 import 'package:kitit/widgets/widow_map.dart';
-import 'package:provider/provider.dart';
+import 'package:kitit/service/DENUE_data.dart';
+import '../widgets/markersComers.dart';
 
 class Map1 extends StatefulWidget {
   Map1({Key? key}) : super(key: key);
@@ -35,9 +32,11 @@ class _Map1State extends State<Map1> {
   Set<Polygon> _polygonSetDisable = new Set();
   CustomInfoWindowController _customInfoWindowController =
       CustomInfoWindowController();
+  Set<Marker> _markersComers = new Set();
+
   LatLng? postionOnTap;
   late LatLng latlon1;
-  final Map<MarkerId, Marker> _markers = {};
+  late Map<MarkerId, Marker> _markers = {};
   Set<Marker> get markers => _markers.values.toSet();
   final _markersController = StreamController<String>.broadcast();
 
@@ -583,13 +582,13 @@ class _Map1State extends State<Map1> {
                                                                           () {
                                                                         buttonAE.value =
                                                                             true;
-                                                                        
+
                                                                         _customInfoWindowController.addInfoWindow!(
                                                                             Container(
-                                                                              padding: const EdgeInsets.symmetric(horizontal: 10, vertical:15),
-                                                                              decoration:  const BoxDecoration(
+                                                                              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 15),
+                                                                              decoration: const BoxDecoration(
                                                                                 // border: Border.all(width: 2,color: Colors.black),
-                                                                                borderRadius:  BorderRadius.all(Radius.circular(10)),
+                                                                                borderRadius: BorderRadius.all(Radius.circular(10)),
                                                                                 color: DesingColors.nuse,
                                                                               ),
                                                                               child: Column(
@@ -598,16 +597,25 @@ class _Map1State extends State<Map1> {
                                                                                       child: Text(
                                                                                     name,
                                                                                     textAlign: TextAlign.center,
-                                                                                    style: const TextStyle( fontSize: 15, color: Colors.white),
+                                                                                    style: const TextStyle(fontSize: 15, color: Colors.white),
                                                                                   )),
-                                                                                  const Divider(color: Colors.white,thickness: 2,),
-                                                                                  Text('$descrip.',style: const TextStyle(fontSize: 13,color: Colors.white,),textAlign: TextAlign.justify),                                                                                ],
+                                                                                  const Divider(
+                                                                                    color: Colors.white,
+                                                                                    thickness: 2,
+                                                                                  ),
+                                                                                  Text('$descrip.',
+                                                                                      style: const TextStyle(
+                                                                                        fontSize: 13,
+                                                                                        color: Colors.white,
+                                                                                      ),
+                                                                                      textAlign: TextAlign.justify),
+                                                                                ],
                                                                               ),
                                                                             ),
                                                                             position);
                                                                         update();
                                                                       },
-                                                                      
+
                                                                       draggable:
                                                                           false,
                                                                     );
@@ -709,7 +717,7 @@ class _Map1State extends State<Map1> {
       List<LatLng> polygonCoords =
           polygonsMetods().geometry_data(listaGeometry[1][i]);
       hola.add(conta);
-      var paa = PolygonId("a");
+
       Polygon po = Polygon(
         geodesic: true,
         polygonId: PolygonId(listaGeometry[0][i]),
