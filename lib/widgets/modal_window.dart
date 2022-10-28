@@ -3,11 +3,19 @@ import 'package:flutter/material.dart';
 import '../service/datos_predios.dart';
 
 class modal_window {
-  late BuildContext context;
+   late BuildContext context;
   late double size_word;
   modal_window(BuildContext context, double size_word) {
     this.context = context;
     this.size_word = size_word;
+  }
+
+   void modal2(String nombreNegocio, String descripcion) {
+    showModalBottomSheet(
+        context: context,
+        builder: (context) {
+          return Expanded(child: Container(color: Colors.amber,));
+        });
   }
 
   dynamic venta_modal_error() {

@@ -1,5 +1,6 @@
 import 'dart:collection';
 import 'dart:ffi';
+import 'dart:io';
 
 import 'package:custom_info_window/custom_info_window.dart';
 import 'package:flutter/material.dart';
@@ -57,6 +58,8 @@ class _Map1State extends State<Map1> {
 
   ValueNotifier<String> direccion = ValueNotifier<String>('');
   ValueNotifier<String> actividadEconomica = ValueNotifier<String>('');
+  ValueNotifier<bool> buttonDisable = ValueNotifier<bool>(true);
+  ValueNotifier<bool> buttonAE = ValueNotifier<bool>(false);
 
   @override
   Widget build(BuildContext context) {
@@ -112,6 +115,9 @@ class _Map1State extends State<Map1> {
     }
 
     void onTap(LatLng position) async {
+      setState(() {
+        postionOnTap = LatLng(position.latitude, position.longitude);
+      });
       List<Placemark> placemarks =
           await placemarkFromCoordinates(position.latitude, position.longitude);
 
@@ -191,7 +197,9 @@ class _Map1State extends State<Map1> {
       }
     }
 
+    // int conta=0;
     GoogleMap mapa = GoogleMap(
+      myLocationEnabled: false,
       mapType: MapType.normal,
       // zoomControlsEnabled: false,
       // polygons: hammerIsTaped == true ? paintPolygons() : _polygonSet,
@@ -305,8 +313,10 @@ class _Map1State extends State<Map1> {
                 ),
               ),
               Builder(builder: (context) {
+                print('DEBERIA ACTIVAR EL BOTOOON');
                 print(window_visiviliti);
-                if (window_visiviliti == true) {
+                print(buttonAE.value);
+                if (window_visiviliti == true || buttonAE.value == true) {
                   return Container(
                     margin: EdgeInsets.only(
                         top: device_data.size.height - 690,
@@ -331,6 +341,7 @@ class _Map1State extends State<Map1> {
                           _polygonSet.addAll(_polygonSet_auxiliar);
 
                           window_visiviliti = false;
+                          buttonAE.value = false;
                         });
                       },
                       child:
@@ -361,6 +372,9 @@ class _Map1State extends State<Map1> {
                     _markers.clear();
                     hasPaintedAZone = false;
                     hammerIsTaped = false;
+                    _textActividadEconomica.clear();
+                    actividadEconomica.value = '';
+                    buttonDisable.value = true;
                   });
                 },
                 child: const Icon(Icons.delete_rounded),
@@ -413,45 +427,211 @@ class _Map1State extends State<Map1> {
                             backgroundColor: DesingColors.yellow,
                             child: const Icon(Icons.storefront),
                             onTap: () {
-                              bool buttonDisable = true;
-
                               showDialog(
                                   context: context,
-                                  builder: (context) => AlertDialog(
-                                        title: const Center(
-                                            child: Text(
-                                          'Escribe tu actividad economica',
-                                          style: TextStyle(fontSize: 18),
-                                        )),
-                                        /////////////////
-                                        content: Padding(
-                                          padding:
-                                              const EdgeInsets.only(top: 5),
-                                          child: TextField(
-                                              decoration: const InputDecoration(
-                                                  errorText: null,
-                                                  hintText:
-                                                      'Ejemplo: Abarrotes'),
-                                              controller:
-                                                  _textActividadEconomica,
-                                              onChanged: (value) {
-                                                actividadEconomica.value =
-                                                    value;
-                                              }),
-                                        ),
-                                        ////////////////
-                                        actions: [
-                                          Center(
-                                            child: ElevatedButton(
-                                                style: ElevatedButton.styleFrom(
-                                                    primary: DesingColors.dark),
-                                                onPressed: buttonDisable == true
-                                                    ? null
-                                                    : () {},
-                                                child: const Text('Siguiente')),
-                                          ),
-                                        ],
-                                      ));
+                                  builder:
+                                      (context) => StatefulBuilder(builder:
+                                              (context, StateSetter setState) {
+                                            return AlertDialog(
+                                              title: const Center(
+                                                  child: Text(
+                                                'Escribe tu actividad economica',
+                                                style: TextStyle(fontSize: 18),
+                                              )),
+                                              /////////////////
+                                              content: Padding(
+                                                padding: const EdgeInsets.only(
+                                                    top: 5),
+                                                child: TextField(
+                                                    decoration: InputDecoration(
+                                                        suffixIcon: Container(
+                                                          color: DesingColors
+                                                              .yellow,
+                                                          child: IconButton(
+                                                              onPressed:
+                                                                  () async {
+                                                                var isEconomyActivity =
+                                                                    await datosDenue
+                                                                        .isEconomyActivity(
+                                                                            actividadEconomica.value);
+
+                                                                if (isEconomyActivity) {
+                                                                  print(
+                                                                      'ESTOY HABILITANDO EL BOTOOOOOON');
+                                                                  buttonDisable
+                                                                          .value =
+                                                                      false;
+                                                                  print(buttonDisable
+                                                                      .value);
+                                                                } else {
+                                                                  print(
+                                                                      'ESTA MAL ASI QUE DESABILITAMOS');
+                                                                  buttonDisable
+                                                                          .value =
+                                                                      true;
+                                                                }
+                                                                setState(
+                                                                  () {},
+                                                                );
+                                                              },
+                                                              icon: const Icon(
+                                                                Icons
+                                                                    .search_rounded,
+                                                                color:
+                                                                    DesingColors
+                                                                        .dark,
+                                                              )),
+                                                        ),
+                                                        errorText: actividadEconomica.value !=
+                                                                    '' &&
+                                                                buttonDisable
+                                                                        .value ==
+                                                                    true
+                                                            ? 'Escribe una actividad economica valida por favor'
+                                                            : null,
+                                                        hintText:
+                                                            'Ejemplo: Abarrotes'),
+                                                    controller:
+                                                        _textActividadEconomica,
+                                                    onChanged: (value) {
+                                                      actividadEconomica.value =
+                                                          value;
+                                                    }),
+                                              ),
+                                              ////////////////
+                                              actions: [
+                                                Center(
+                                                  child: ElevatedButton(
+                                                      style: ElevatedButton
+                                                          .styleFrom(
+                                                              primary:
+                                                                  DesingColors
+                                                                      .dark),
+                                                      onPressed:
+                                                          buttonDisable.value ==
+                                                                  true
+                                                              ? null
+                                                              : () async {
+                                                                  int cont = 0;
+                                                                  modal_window
+                                                                      modalWindow =
+                                                                      modal_window(
+                                                                          context,
+                                                                          13);
+                                                                  List<Map> list = await datosDenue.fetchPost(
+                                                                      actividadEconomica
+                                                                          .value,
+                                                                      postionOnTap!
+                                                                          .latitude
+                                                                          .toString(),
+                                                                      postionOnTap!
+                                                                          .longitude
+                                                                          .toString());
+
+                                                                  for (var element
+                                                                      in list) {
+                                                                    print(
+                                                                        'Hola este es ${element}');
+
+                                                                    String
+                                                                        name =
+                                                                        element[
+                                                                            'nombre'];
+                                                                    String
+                                                                        descrip =
+                                                                        element[
+                                                                            'descripcion'];
+
+                                                                    double lat =
+                                                                        double.parse(
+                                                                            element['lat']);
+
+                                                                    double lon =
+                                                                        double.parse(
+                                                                            element['lon']);
+
+                                                                    LatLng
+                                                                        position =
+                                                                        LatLng(
+                                                                            lat,
+                                                                            lon);
+
+                                                                    var markerId =
+                                                                        MarkerId(
+                                                                            'rivals$cont');
+                                                                    cont++;
+                                                                    final marker =
+                                                                        Marker(
+                                                                      icon: BitmapDescriptor.defaultMarkerWithHue(
+                                                                          BitmapDescriptor
+                                                                              .hueMagenta),
+                                                                      markerId:
+                                                                          markerId,
+                                                                      position:
+                                                                          position,
+                                                                      zIndex: 2,
+                                                                      anchor:
+                                                                          const Offset(
+                                                                              0.5,
+                                                                              1),
+                                                                      // infoWindow: InfoWindow(
+                                                                      //     title:
+                                                                      //         name,
+                                                                      //     snippet:
+                                                                      //         descrip),
+                                                                      onTap:
+                                                                          () {
+                                                                        buttonAE.value =
+                                                                            true;
+                                                                        
+                                                                        _customInfoWindowController.addInfoWindow!(
+                                                                            Container(
+                                                                              padding: const EdgeInsets.symmetric(horizontal: 10, vertical:15),
+                                                                              decoration:  const BoxDecoration(
+                                                                                // border: Border.all(width: 2,color: Colors.black),
+                                                                                borderRadius:  BorderRadius.all(Radius.circular(10)),
+                                                                                color: DesingColors.nuse,
+                                                                              ),
+                                                                              child: Column(
+                                                                                children: [
+                                                                                  Center(
+                                                                                      child: Text(
+                                                                                    name,
+                                                                                    textAlign: TextAlign.center,
+                                                                                    style: const TextStyle( fontSize: 15, color: Colors.white),
+                                                                                  )),
+                                                                                  const Divider(color: Colors.white,thickness: 2,),
+                                                                                  Text('$descrip.',style: const TextStyle(fontSize: 13,color: Colors.white,),textAlign: TextAlign.justify),                                                                                ],
+                                                                              ),
+                                                                            ),
+                                                                            position);
+                                                                        update();
+                                                                      },
+                                                                      
+                                                                      draggable:
+                                                                          false,
+                                                                    );
+
+                                                                    setState(
+                                                                        () {
+                                                                      _markers[
+                                                                              markerId] =
+                                                                          marker;
+                                                                    });
+                                                                  }
+                                                                  print(
+                                                                      _markers);
+
+                                                                  // ignore: use_build_context_synchronously
+                                                                  Navigator.pop(
+                                                                      context);
+                                                                },
+                                                      child: const Text(
+                                                          'Siguiente')),
+                                                ),
+                                              ],
+                                            );
+                                          }));
                             }),
                       ],
                     );
@@ -598,5 +778,9 @@ class _Map1State extends State<Map1> {
         _polygonSet.add(po);
       },
     );
+  }
+
+  void update() {
+    setState(() {});
   }
 }
