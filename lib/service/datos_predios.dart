@@ -32,7 +32,7 @@ Future<dynamic> data_predio_cordenada(list_cordenadas) async {
     // If the server did return a 200 OK response,
     // then parse the JSON.
     var data = json.decode(response.body);
-    print(data);
+    // print(data);
    
 
     return data;

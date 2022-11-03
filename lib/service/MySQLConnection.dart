@@ -17,7 +17,7 @@ class MySQLConnector {
 
   static void connection() async {
     connector = await MySQLConnection.createConnection(
-      host: "192.168.100.201",
+      host: "192.168.100.249",
       port: 3306,
       userName: "kikit2",
       password: "polloasado1",
@@ -85,7 +85,7 @@ class MySQLConnector {
   static Future<List> getMarkersbyCP(CP) async {
     List markers_list = [];
     var result = await connector.execute(
-      "select * from datos_prueba where codigoPostal= :CP",
+      "select * from comercios where codigoPostal= :CP",
       {'CP': CP},
     );
 

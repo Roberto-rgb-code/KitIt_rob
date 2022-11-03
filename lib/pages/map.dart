@@ -126,15 +126,23 @@ class _Map1State extends State<Map1> {
       if (!hasPaintedAZone) {
         print(
             'PINTANDO POLIGONOS______________________________________________________________________');
+
         var res_data =
             await MySQLConnector.getMarkersbyCP(placemarks[0].postalCode);
+
         MarkersCom markerscom = MarkersCom(res_data);
+        // ignore: use_build_context_synchronously
+
+        // Set<Marker> p = await markerscom.printMarkersComers(
+        //     _customInfoWindowController, context);
+        
         setState(() {
           hasPaintedAZone = true;
           myPolygon(resultados);
 
-          _markersComers = markerscom.printMarkersComers(
-              _customInfoWindowController, context);
+          _markersComers =  markerscom.printMarkersComers(
+            _customInfoWindowController, context,deviceData);
+
           for (Marker element in _markersComers) {
             _markers[element.markerId] = element;
           }
@@ -414,20 +422,20 @@ class _Map1State extends State<Map1> {
                       animatedIcon: AnimatedIcons.menu_close,
                       spaceBetweenChildren: 10,
                       children: [
-                        SpeedDialChild(
-                            backgroundColor: DesingColors.yellow,
-                            onTap: () {
-                              setState(
-                                () {
-                                  if (hammerIsTaped) {
-                                    _markers
-                                        .remove(const MarkerId('hammerMaker'));
-                                  }
-                                  hammerIsTaped = !hammerIsTaped;
-                                },
-                              );
-                            },
-                            child: const Icon(Icons.gavel_rounded)),
+                        // SpeedDialChild(
+                        //     backgroundColor: DesingColors.yellow,
+                        //     onTap: () {
+                        //       setState(
+                        //         () {
+                        //           if (hammerIsTaped) {
+                        //             _markers
+                        //                 .remove(const MarkerId('hammerMaker'));
+                        //           }
+                        //           hammerIsTaped = !hammerIsTaped;
+                        //         },
+                        //       );
+                        //     },
+                        //     child: const Icon(Icons.gavel_rounded)),
                         SpeedDialChild(
                           backgroundColor: DesingColors.yellow,
                           child: const Icon(Icons.route_rounded),
