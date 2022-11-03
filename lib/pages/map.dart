@@ -72,6 +72,13 @@ class _Map1State extends State<Map1> {
       // double long = -103.3867676;
 
       final GoogleMapController controller = await _controller.future;
+      final icon = await BitmapDescriptor.fromAssetImage(
+        const ImageConfiguration(
+          
+        ), 
+        'lib/_img/amarilloyblanco(1).png'
+      );
+
 
       LatLng latLngPosition = LatLng(lat, long);
 
@@ -85,12 +92,11 @@ class _Map1State extends State<Map1> {
       );
 
       setState(() {
+        
         final id = _markers.length.toString();
         final markerId = MarkerId(id);
-
         final marker = Marker(
-          icon:
-              BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueAzure),
+          icon:icon,
           markerId: markerId,
           position: latLngPosition,
           anchor: const Offset(0.5, 1),
@@ -119,6 +125,11 @@ class _Map1State extends State<Map1> {
       });
       List<Placemark> placemarks =
           await placemarkFromCoordinates(position.latitude, position.longitude);
+      final icon = await BitmapDescriptor.fromAssetImage(
+        const ImageConfiguration(), 
+        'lib/_img/amarilloyblanco(1).png'
+      );
+
 
       print('ESTAS TAPEANDO EL MAPA');
       final resultados = await MySQLConnector.getData(placemarks[0].postalCode);
@@ -132,17 +143,13 @@ class _Map1State extends State<Map1> {
 
         MarkersCom markerscom = MarkersCom(res_data);
         // ignore: use_build_context_synchronously
-
-        // Set<Marker> p = await markerscom.printMarkersComers(
-        //     _customInfoWindowController, context);
-        
+        final marcadordeldani = await markerscom.printMarkersComers(
+              _customInfoWindowController, context,deviceData);
         setState(() {
           hasPaintedAZone = true;
           myPolygon(resultados);
-
-          _markersComers =  markerscom.printMarkersComers(
-            _customInfoWindowController, context,deviceData);
-
+          _markersComers = marcadordeldani;
+          
           for (Marker element in _markersComers) {
             _markers[element.markerId] = element;
           }
@@ -164,8 +171,7 @@ class _Map1State extends State<Map1> {
           final markerId = MarkerId(id);
 
           final marker = Marker(
-            icon: BitmapDescriptor.defaultMarkerWithHue(
-                BitmapDescriptor.hueAzure),
+            icon: icon,
             markerId: markerId,
             position: position,
             zIndex: 2,
@@ -529,6 +535,12 @@ class _Map1State extends State<Map1> {
                                                                   true
                                                               ? null
                                                               : () async {
+                                                                    final icon = await BitmapDescriptor.fromAssetImage(
+                                                                    const ImageConfiguration(
+                                                                      //size: Size(20, 20),
+                                                                    ), 
+                                                                    'lib/_img/amarilloyblanco(1).png'
+                                                                  );
                                                                   int cont = 0;
                                                                   modal_window
                                                                       modalWindow =
@@ -579,9 +591,7 @@ class _Map1State extends State<Map1> {
                                                                     cont++;
                                                                     final marker =
                                                                         Marker(
-                                                                      icon: BitmapDescriptor.defaultMarkerWithHue(
-                                                                          BitmapDescriptor
-                                                                              .hueMagenta),
+                                                                      icon: icon,
                                                                       markerId:
                                                                           markerId,
                                                                       position:
