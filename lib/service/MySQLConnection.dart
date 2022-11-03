@@ -17,11 +17,11 @@ class MySQLConnector {
 
   static void connection() async {
     connector = await MySQLConnection.createConnection(
-      host: "192.168.100.249",
+      host: "173.201.188.200",
       port: 3306,
-      userName: "kikit2",
-      password: "polloasado1",
-      databaseName: "kikit", // optional
+      userName: "dbUKikitLocales",
+      password: "[D^JosvIrT{u",
+      databaseName: "KIKIT_locales", // optional
     );
     print('CONENCTANDO A BASE DE DATOS');
     await connector.connect();
