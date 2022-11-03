@@ -16,9 +16,17 @@ class MarkersCom {
   MarkersCom(List data_markers) {
     this.data_markers = data_markers;
   }
+  
 
-  Set<Marker> printMarkersComers(
-      CustomInfoWindowController _customInfoWindowController, context) {
+  Future<Set<Marker>> printMarkersComers(
+    
+      CustomInfoWindowController _customInfoWindowController, context) async {
+        final icon = await BitmapDescriptor.fromAssetImage(
+        const ImageConfiguration(
+          
+        ), 
+        'lib/_img/dispv1.png'
+      );
     List LonLat_markers = [];
 
     for (var i = 0; i < data_markers.length; i++) {
@@ -29,7 +37,7 @@ class MarkersCom {
       Marker markerNew = Marker(
         markerId: MarkerId("${i}"),
         consumeTapEvents: true,
-        icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueGreen),
+        icon: icon,
         position: LatLng(
           double.parse(cord_list[0]),
           double.parse(cord_list[1]),
