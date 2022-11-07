@@ -73,12 +73,7 @@ class _Map1State extends State<Map1> {
 
       final GoogleMapController controller = await _controller.future;
       final icon = await BitmapDescriptor.fromAssetImage(
-        const ImageConfiguration(
-          
-        ), 
-        'lib/_img/amarilloyblanco(1).png'
-      );
-
+          const ImageConfiguration(), 'lib/_img/amarilloyblanco(1).png');
 
       LatLng latLngPosition = LatLng(lat, long);
 
@@ -92,11 +87,10 @@ class _Map1State extends State<Map1> {
       );
 
       setState(() {
-        
         final id = _markers.length.toString();
         final markerId = MarkerId(id);
         final marker = Marker(
-          icon:icon,
+          icon: icon,
           markerId: markerId,
           position: latLngPosition,
           anchor: const Offset(0.5, 1),
@@ -123,13 +117,11 @@ class _Map1State extends State<Map1> {
       setState(() {
         postionOnTap = LatLng(position.latitude, position.longitude);
       });
+
       List<Placemark> placemarks =
           await placemarkFromCoordinates(position.latitude, position.longitude);
       final icon = await BitmapDescriptor.fromAssetImage(
-        const ImageConfiguration(), 
-        'lib/_img/amarilloyblanco(1).png'
-      );
-
+          const ImageConfiguration(), 'lib/_img/amarilloyblanco(1).png');
 
       print('ESTAS TAPEANDO EL MAPA');
       final resultados = await MySQLConnector.getData(placemarks[0].postalCode);
@@ -140,23 +132,25 @@ class _Map1State extends State<Map1> {
 
         var res_data =
             await MySQLConnector.getMarkersbyCP(placemarks[0].postalCode);
+        print("el edgar es puto___________________________");
+        print(res_data);
 
         MarkersCom markerscom = MarkersCom(res_data);
         // ignore: use_build_context_synchronously
         final marcadordeldani = await markerscom.printMarkersComers(
-              _customInfoWindowController, context,deviceData);
+            _customInfoWindowController, context, deviceData);
         setState(() {
           hasPaintedAZone = true;
           myPolygon(resultados);
           _markersComers = marcadordeldani;
-          
+
           for (Marker element in _markersComers) {
             _markers[element.markerId] = element;
           }
-          print(
-              "________________________________________________________________________________ Hola soy marker nuevo");
-          print(_markers.length);
-          print(_markers);
+          // print(
+          //     "________________________________________________________________________________ Hola soy marker nuevo");
+          // print(_markers.length);
+          // print(_markers);
         });
       }
 
@@ -319,6 +313,19 @@ class _Map1State extends State<Map1> {
                           final resultados = await MySQLConnector.getData(
                               placemarks[0].postalCode);
 
+                          var res_data = await MySQLConnector.getMarkersbyCP(
+                              placemarks[0].postalCode);
+                          print("el edgar es puto___________________________");
+                          print(res_data);
+
+                          MarkersCom markerscom = MarkersCom(res_data);
+                          // ignore: use_build_context_synchronously
+                          final marcadordeldani =
+                              await markerscom.printMarkersComers(
+                                  _customInfoWindowController,
+                                  context,
+                                  deviceData);
+
                           setState(() {
                             print('PINTAR LA ZONA_______________');
 
@@ -327,6 +334,14 @@ class _Map1State extends State<Map1> {
                             myPolygon(resultados);
 
                             postionOnTap = latLngPosition;
+
+                            hasPaintedAZone = true;
+                            myPolygon(resultados);
+                            _markersComers = marcadordeldani;
+
+                            for (Marker element in _markersComers) {
+                              _markers[element.markerId] = element;
+                            }
                           });
                         }
                       },
@@ -535,12 +550,11 @@ class _Map1State extends State<Map1> {
                                                                   true
                                                               ? null
                                                               : () async {
-                                                                    final icon = await BitmapDescriptor.fromAssetImage(
-                                                                    const ImageConfiguration(
-                                                                      //size: Size(20, 20),
-                                                                    ), 
-                                                                    'lib/_img/amarilloyblanco(1).png'
-                                                                  );
+                                                                  final icon = await BitmapDescriptor.fromAssetImage(
+                                                                      const ImageConfiguration(
+                                                                          //size: Size(20, 20),
+                                                                          ),
+                                                                      'lib/_img/amarilloyblanco(1).png');
                                                                   int cont = 0;
                                                                   modal_window
                                                                       modalWindow =
@@ -591,7 +605,8 @@ class _Map1State extends State<Map1> {
                                                                     cont++;
                                                                     final marker =
                                                                         Marker(
-                                                                      icon: icon,
+                                                                      icon:
+                                                                          icon,
                                                                       markerId:
                                                                           markerId,
                                                                       position:
