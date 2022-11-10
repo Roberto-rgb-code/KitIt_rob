@@ -13,6 +13,8 @@ import 'package:kitit/resourses/exceReader.dart';
 import 'package:kitit/service/MySQLConnection.dart';
 import 'package:kitit/service/datos_predios.dart';
 import 'package:geocoding/geocoding.dart';
+import 'package:kitit/widgets/ClasificationLocations.dart';
+import 'package:kitit/widgets/demograficModal.dart';
 import 'package:kitit/widgets/modal_window.dart';
 import 'package:kitit/widgets/polygons_metods.dart';
 import 'package:kitit/widgets/widow_map.dart';
@@ -59,6 +61,8 @@ class _Map1State extends State<Map1> {
   ValueNotifier<String> actividadEconomica = ValueNotifier<String>('');
   ValueNotifier<bool> buttonDisable = ValueNotifier<bool>(true);
   ValueNotifier<bool> buttonAE = ValueNotifier<bool>(false);
+  ValueNotifier<List<int>> totalHabitantes =
+      ValueNotifier<List<int>>([0, 0, 0]);
 
   @override
   Widget build(BuildContext context) {
@@ -126,14 +130,21 @@ class _Map1State extends State<Map1> {
       print('ESTAS TAPEANDO EL MAPA');
       final resultados = await MySQLConnector.getData(placemarks[0].postalCode);
 
+      for (Map element in resultados[2]) {
+        totalHabitantes.value[0] += int.parse(element['t']);
+        totalHabitantes.value[1] += int.parse(element['m']);
+        totalHabitantes.value[2] += int.parse(element['f']);
+      }
+
+      print('CONTANDO TODOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO');
+      print(totalHabitantes.value);
+
       if (!hasPaintedAZone) {
         print(
             'PINTANDO POLIGONOS______________________________________________________________________');
 
         var res_data =
             await MySQLConnector.getMarkersbyCP(placemarks[0].postalCode);
-        print("el edgar es puto___________________________");
-        print(res_data);
 
         MarkersCom markerscom = MarkersCom(res_data);
         // ignore: use_build_context_synchronously
@@ -184,8 +195,6 @@ class _Map1State extends State<Map1> {
           );
 
           _markers[markerId] = marker;
-
-          // data_predio_cordenada([position.]);
         });
         //AQUI ES DONDE LLAMAREMOS LA VENTANA MODAL
         modal_window modal = modal_window(context, 17);
@@ -239,6 +248,16 @@ class _Map1State extends State<Map1> {
     );
 
     var device_data = MediaQuery.of(context);
+
+    var size = device_data.size;
+
+    Map clasification = {
+      'm2': null,
+      'precio': null,
+      'habitaciones': null,
+      'baños': null,
+      'garage': null
+    };
 
     return SafeArea(
       child: Scaffold(
@@ -313,14 +332,23 @@ class _Map1State extends State<Map1> {
                           final resultados = await MySQLConnector.getData(
                               placemarks[0].postalCode);
 
+                          for (Map element in resultados[2]) {
+                            totalHabitantes.value[0] += int.parse(element['t']);
+                            totalHabitantes.value[1] += int.parse(element['m']);
+                            totalHabitantes.value[2] += int.parse(element['f']);
+                          }
+
+                          print(
+                              'CONTANDO TODOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO');
+                          print(totalHabitantes.value);
+
                           var res_data = await MySQLConnector.getMarkersbyCP(
                               placemarks[0].postalCode);
-                          print("el edgar es puto___________________________");
-                          print(res_data);
 
                           MarkersCom markerscom = MarkersCom(res_data);
                           // ignore: use_build_context_synchronously
                           final marcadordeldani =
+                              // ignore: use_build_context_synchronously
                               await markerscom.printMarkersComers(
                                   _customInfoWindowController,
                                   context,
@@ -349,10 +377,61 @@ class _Map1State extends State<Map1> {
                         Icons.search_rounded,
                         // color: DesingColors.yellow,
                       ),
-                    )
+                    ),
                   ],
                 ),
               ),
+              Builder(builder: (context) {
+                if (hasPaintedAZone) {
+                  return ElevatedButton(
+                      onPressed: () async {
+                        final filters = await showDialog(
+                            context: context,
+                            builder: (context) {
+                              return AlertDialog(
+                                title: const Center(
+                                  child: Text('Filtra tu busqueda'),
+                                ),
+                                content: Center(
+                                  child: Column(
+                                    children: [
+                                      Text('Rango de precio de los locales:'),
+                                      SliderPrice(
+                                        rangeValue: (value) {
+                                          clasification['precio'] = value;
+                                        },        
+                                      )
+                                    ],
+                                  ),
+                                ),
+                              );
+                            });
+                      },
+                      child: const Icon(Icons.filter_list_rounded));
+
+                  // Container(
+                  //   decoration: const BoxDecoration(
+                  //     borderRadius: BorderRadius.all(Radius.circular(10)),
+                  //     color: Colors.white,
+                  //   ),
+                  //   margin: EdgeInsets.symmetric(
+                  //       vertical: size.height * 0.13, horizontal: 10),
+                  //   width: size.width * 0.8,
+                  //   height: size.height * 0.08,
+                  //   child: Row(
+                  //     children: [
+                  //       SliderPrice(
+                  //         rangeValue: (value) {
+                  //           clasification['precio'] = value;
+                  //         },
+                  //       )
+                  //     ],
+                  //   ),
+                  // );
+                } else {
+                  return const Text('');
+                }
+              }),
               Builder(builder: (context) {
                 if (window_visiviliti == true || buttonAE.value == true) {
                   return Container(
@@ -401,8 +480,13 @@ class _Map1State extends State<Map1> {
               FloatingActionButton(
                 backgroundColor: DesingColors.dark,
                 onPressed: () {
+                  print('RANGO DE PRECIOOOOOOOOOOOOOOO');
+                  print(clasification['precio']);
                   _polygonSet.clear();
                   _textLugar.clear();
+                  totalHabitantes.value[0] = 0;
+                  totalHabitantes.value[1] = 0;
+                  totalHabitantes.value[2] = 0;
 
                   setState(() {
                     _customInfoWindowController.hideInfoWindow!();
@@ -443,23 +527,35 @@ class _Map1State extends State<Map1> {
                       animatedIcon: AnimatedIcons.menu_close,
                       spaceBetweenChildren: 10,
                       children: [
-                        // SpeedDialChild(
-                        //     backgroundColor: DesingColors.yellow,
-                        //     onTap: () {
-                        //       setState(
-                        //         () {
-                        //           if (hammerIsTaped) {
-                        //             _markers
-                        //                 .remove(const MarkerId('hammerMaker'));
-                        //           }
-                        //           hammerIsTaped = !hammerIsTaped;
-                        //         },
-                        //       );
-                        //     },
-                        //     child: const Icon(Icons.gavel_rounded)),
+                        SpeedDialChild(
+                            backgroundColor: DesingColors.yellow,
+                            onTap: () {
+                              setState(
+                                () {
+                                  if (hammerIsTaped) {
+                                    _markers
+                                        .remove(const MarkerId('hammerMaker'));
+                                  }
+                                  hammerIsTaped = !hammerIsTaped;
+                                },
+                              );
+                            },
+                            child: const Icon(Icons.gavel_rounded)),
                         SpeedDialChild(
                           backgroundColor: DesingColors.yellow,
                           child: const Icon(Icons.route_rounded),
+                        ),
+                        SpeedDialChild(
+                          backgroundColor: DesingColors.yellow,
+                          child: const Icon(Icons.analytics_rounded),
+                          onTap: () {
+                            showDialog(
+                                context: context,
+                                builder: (context) => DemograficModal(
+                                    total: totalHabitantes.value[0],
+                                    hombres: totalHabitantes.value[1],
+                                    mujeres: totalHabitantes.value[2]));
+                          },
                         ),
                         SpeedDialChild(
                             backgroundColor: DesingColors.yellow,

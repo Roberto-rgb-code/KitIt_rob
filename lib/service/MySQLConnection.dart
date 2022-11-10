@@ -22,6 +22,7 @@ class MySQLConnector {
       userName: "dbUKikitLocales",
       password: "[D^JosvIrT{u",
       databaseName: "KIKIT_locales", // optional
+      
     );
     print('CONENCTANDO A BASE DE DATOS');
     await connector.connect();
