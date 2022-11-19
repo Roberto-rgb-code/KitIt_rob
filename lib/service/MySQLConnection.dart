@@ -1,17 +1,14 @@
 import 'package:mysql_client/mysql_client.dart';
 
 class MySQLConnector {
+  static final connector = MySQLConnectionPool(
+      host: "173.201.188.200",
+      port: 3306,
+      userName: "dbUKikitLocales",
+      password: "[D^JosvIrT{u",
+      databaseName: "KIKIT_locales", // optional
+      maxConnections: 100);
 
-   static final connector = MySQLConnectionPool(
-        host: "173.201.188.200",
-        port: 3306,
-        userName: "dbUKikitLocales",
-        password: "[D^JosvIrT{u",
-        databaseName: "KIKIT_locales", // optional
-        maxConnections: 100
-        );
-
-  
   static Future<List> getData(CP) async {
     List geometry_list = [];
     List demografic_data = [];
@@ -66,8 +63,8 @@ class MySQLConnector {
       "select * from comercios where codigoPostal= :CP",
       {'CP': CP},
     );
-
     for (final row in result.rows) {
+    
       markers_list.add(row.assoc());
     }
     return markers_list;

@@ -24,20 +24,17 @@ class MarkersCom {
   MarkersCom(List data_markers) {
     this.data_markers = data_markers;
   }
-  
 
   Future<Set<Marker>> printMarkersComers(
-    
-      CustomInfoWindowController _customInfoWindowController, context,MediaQueryData deviceData) async {
-        final icon = await BitmapDescriptor.fromAssetImage(
-        const ImageConfiguration(
-          
-        ), 
-        'lib/_img/dispv1.png'
-      );
+      CustomInfoWindowController _customInfoWindowController,
+      context,
+      MediaQueryData deviceData) async {
+    final icon = await BitmapDescriptor.fromAssetImage(
+        const ImageConfiguration(), 'lib/_img/dispv1.png');
     List LonLat_markers = [];
     Size size = deviceData.size;
     for (var i = 0; i < data_markers.length; i++) {
+
       String cord_aux = data_markers[i]["coordenadas"].replaceAll(" ", "");
 
       List cord_list = cord_aux.split(",");
@@ -169,7 +166,7 @@ class MarkersCom {
                               margin: const EdgeInsets.only(top: 10),
                               child: Center(
                                 child: Column(
-                                  children: bothPermitions(data,size),
+                                  children: bothPermitions(data, size),
                                 ),
                               ),
                             )
@@ -198,11 +195,6 @@ class MarkersCom {
 
     Iterable keysData = dataJson.keys;
 
-    for (var element in keysData) {
-      print('TITULO: $element');
-
-      print('INFO: ${dataJson[element]}');
-    }
     return dataJson;
   }
 
@@ -348,7 +340,7 @@ class MarkersCom {
     ];
   }
 
-  List<Widget> bothPermitions(Map data,Size size) {
+  List<Widget> bothPermitions(Map data, Size size) {
     List<Widget> listaUsosPermitidos = [];
     List<Widget> listaUsosCondicionados = [];
 
@@ -357,19 +349,49 @@ class MarkersCom {
       String? d = tipos_uso_nombre[element];
       listaUsosPermitidos.add(Padding(
         padding: const EdgeInsets.all(3.0),
-        child: Text(d!,style: const TextStyle(color: Colors.white),),
+        child: Text(
+          d!,
+          style: const TextStyle(color: Colors.white),
+        ),
       ));
     }
     for (var element in data['zonificacion_default']['usos_condicionados']) {
       String? d = tipos_uso_nombre[element];
-      listaUsosCondicionados.add(Text(d!,style: const TextStyle(color: Colors.white)));
+      listaUsosCondicionados
+          .add(Text(d!, style: const TextStyle(color: Colors.white)));
     }
 
     return [
-      SizedBox(width: size.width*0.85,child: ExpansionTile(iconColor: Colors.white,collapsedIconColor: Colors.white,collapsedTextColor: Colors.white,collapsedBackgroundColor: Colors.black,textColor: Colors.white,backgroundColor: Colors.black,title: const Text('Usos permitidos'),children: listaUsosPermitidos,)),
-      const SizedBox(height: 15,),
-      SizedBox(width: size.width*0.85,child: ExpansionTile(iconColor: Colors.white,collapsedIconColor: Colors.white,collapsedTextColor: Colors.white,collapsedBackgroundColor: Colors.black,textColor: Colors.white,backgroundColor: Colors.black,title: const Text('Usos condicionados'),children: listaUsosCondicionados,)),
-      const SizedBox(height: 15,),
+      SizedBox(
+          width: size.width * 0.85,
+          child: ExpansionTile(
+            iconColor: Colors.white,
+            collapsedIconColor: Colors.white,
+            collapsedTextColor: Colors.white,
+            collapsedBackgroundColor: Colors.black,
+            textColor: Colors.white,
+            backgroundColor: Colors.black,
+            title: const Text('Usos permitidos'),
+            children: listaUsosPermitidos,
+          )),
+      const SizedBox(
+        height: 15,
+      ),
+      SizedBox(
+          width: size.width * 0.85,
+          child: ExpansionTile(
+            iconColor: Colors.white,
+            collapsedIconColor: Colors.white,
+            collapsedTextColor: Colors.white,
+            collapsedBackgroundColor: Colors.black,
+            textColor: Colors.white,
+            backgroundColor: Colors.black,
+            title: const Text('Usos condicionados'),
+            children: listaUsosCondicionados,
+          )),
+      const SizedBox(
+        height: 15,
+      ),
     ];
   }
 }

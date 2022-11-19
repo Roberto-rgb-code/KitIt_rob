@@ -1,7 +1,3 @@
-import 'dart:collection';
-import 'dart:ffi';
-import 'dart:io';
-
 import 'package:custom_info_window/custom_info_window.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_speed_dial/flutter_speed_dial.dart';
@@ -13,12 +9,13 @@ import 'package:kitit/resourses/exceReader.dart';
 import 'package:kitit/service/MySQLConnection.dart';
 import 'package:kitit/service/datos_predios.dart';
 import 'package:geocoding/geocoding.dart';
-import 'package:kitit/widgets/ClasificationLocations.dart';
+import 'package:kitit/widgets/SliderM2.dart';
 import 'package:kitit/widgets/demograficModal.dart';
 import 'package:kitit/widgets/modal_window.dart';
 import 'package:kitit/widgets/polygons_metods.dart';
 import 'package:kitit/widgets/widow_map.dart';
 import 'package:kitit/service/DENUE_data.dart';
+import '../widgets/SliderPrice.dart';
 import '../widgets/markersComers.dart';
 
 class Map1 extends StatefulWidget {
@@ -34,7 +31,6 @@ class _Map1State extends State<Map1> {
   Set<Polygon> _polygonSetDisable = new Set();
   CustomInfoWindowController _customInfoWindowController =
       CustomInfoWindowController();
-  Set<Marker> _markersComers = new Set();
 
   LatLng? postionOnTap;
   late LatLng latlon1;
@@ -51,7 +47,7 @@ class _Map1State extends State<Map1> {
   bool hammerIsTaped = false;
   bool hasPaintedAZone = false;
   bool window_visiviliti = false;
-
+  String? postalCode;
   static const CameraPosition _kGooglePlex = CameraPosition(
     target: LatLng(20.6599162, -103.3450723),
     zoom: 11,
@@ -63,7 +59,7 @@ class _Map1State extends State<Map1> {
   ValueNotifier<bool> buttonAE = ValueNotifier<bool>(false);
   ValueNotifier<List<int>> totalHabitantes =
       ValueNotifier<List<int>>([0, 0, 0]);
-
+  bool hasChangedFilter = false;
   @override
   Widget build(BuildContext context) {
     var deviceData = MediaQuery.of(context);
@@ -136,26 +132,24 @@ class _Map1State extends State<Map1> {
         totalHabitantes.value[2] += int.parse(element['f']);
       }
 
-      print('CONTANDO TODOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO');
-      print(totalHabitantes.value);
-
       if (!hasPaintedAZone) {
         print(
             'PINTANDO POLIGONOS______________________________________________________________________');
 
         var res_data =
             await MySQLConnector.getMarkersbyCP(placemarks[0].postalCode);
-
+        setState(() {
+          postalCode = placemarks[0].postalCode;
+        });
         MarkersCom markerscom = MarkersCom(res_data);
         // ignore: use_build_context_synchronously
-        final marcadordeldani = await markerscom.printMarkersComers(
+        final markersComers = await markerscom.printMarkersComers(
             _customInfoWindowController, context, deviceData);
         setState(() {
           hasPaintedAZone = true;
           myPolygon(resultados);
-          _markersComers = marcadordeldani;
 
-          for (Marker element in _markersComers) {
+          for (Marker element in markersComers) {
             _markers[element.markerId] = element;
           }
           // print(
@@ -226,6 +220,24 @@ class _Map1State extends State<Map1> {
       }
     }
 
+    Map clasification = {
+      'm2': null,
+      'precio': null,
+      'habitaciones': null,
+      'baños': null,
+      'garage': null
+    };
+
+    bool hasClasificationChanged() {
+      for (var element in clasification.keys) {
+        if (clasification[element] != null) {
+          return true;
+        }
+      }
+
+      return false;
+    }
+
     // int conta=0;
     GoogleMap mapa = GoogleMap(
       myLocationEnabled: false,
@@ -250,14 +262,6 @@ class _Map1State extends State<Map1> {
     var device_data = MediaQuery.of(context);
 
     var size = device_data.size;
-
-    Map clasification = {
-      'm2': null,
-      'precio': null,
-      'habitaciones': null,
-      'baños': null,
-      'garage': null
-    };
 
     return SafeArea(
       child: Scaffold(
@@ -338,16 +342,15 @@ class _Map1State extends State<Map1> {
                             totalHabitantes.value[2] += int.parse(element['f']);
                           }
 
-                          print(
-                              'CONTANDO TODOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO');
-                          print(totalHabitantes.value);
-
                           var res_data = await MySQLConnector.getMarkersbyCP(
                               placemarks[0].postalCode);
 
+                          setState(() {
+                            postalCode = placemarks[0].postalCode;
+                          });
                           MarkersCom markerscom = MarkersCom(res_data);
                           // ignore: use_build_context_synchronously
-                          final marcadordeldani =
+                          final markersComers =
                               // ignore: use_build_context_synchronously
                               await markerscom.printMarkersComers(
                                   _customInfoWindowController,
@@ -365,9 +368,8 @@ class _Map1State extends State<Map1> {
 
                             hasPaintedAZone = true;
                             myPolygon(resultados);
-                            _markersComers = marcadordeldani;
 
-                            for (Marker element in _markersComers) {
+                            for (Marker element in markersComers) {
                               _markers[element.markerId] = element;
                             }
                           });
@@ -383,55 +385,240 @@ class _Map1State extends State<Map1> {
               ),
               Builder(builder: (context) {
                 if (hasPaintedAZone) {
-                  return ElevatedButton(
-                      onPressed: () async {
-                        final filters = await showDialog(
-                            context: context,
-                            builder: (context) {
-                              return AlertDialog(
-                                title: const Center(
-                                  child: Text('Filtra tu busqueda'),
-                                ),
-                                content: Center(
-                                  child: Column(
-                                    children: [
-                                      Text('Rango de precio de los locales:'),
-                                      SliderPrice(
-                                        rangeValue: (value) {
-                                          clasification['precio'] = value;
-                                        },        
-                                      )
-                                    ],
-                                  ),
-                                ),
-                              );
-                            });
-                      },
-                      child: const Icon(Icons.filter_list_rounded));
+                  return Container(
+                    margin: EdgeInsets.symmetric(
+                        vertical: size.height * 0.12, horizontal: 10),
+                    child: ElevatedButton(
+                        style: ElevatedButton.styleFrom(primary: Colors.black),
+                        onPressed: () async {
+                          ///////
 
-                  // Container(
-                  //   decoration: const BoxDecoration(
-                  //     borderRadius: BorderRadius.all(Radius.circular(10)),
-                  //     color: Colors.white,
-                  //   ),
-                  //   margin: EdgeInsets.symmetric(
-                  //       vertical: size.height * 0.13, horizontal: 10),
-                  //   width: size.width * 0.8,
-                  //   height: size.height * 0.08,
-                  //   child: Row(
-                  //     children: [
-                  //       SliderPrice(
-                  //         rangeValue: (value) {
-                  //           clasification['precio'] = value;
-                  //         },
-                  //       )
-                  //     ],
-                  //   ),
-                  // );
+                          await showDialog(
+                              context: context,
+                              builder: (context) {
+                                return AlertDialog(
+                                  title: const Center(
+                                    child: Text('Filtra tu busqueda'),
+                                  ),
+                                  content: SizedBox(
+                                    height: size.height * 0.36,
+                                    child: Center(
+                                      child: Column(
+                                        children: [
+                                          const Text(
+                                              'Rango de precio de los locales:'),
+                                          SliderPrice(
+                                            rangeValue: (value) {
+                                              clasification['precio'] = value;
+                                            },
+                                          ),
+                                          Text('Rango de m3 de los locales:'),
+                                          SliderM2(
+                                            rangeValue: (value) {
+                                              clasification['m2'] = value;
+                                            },
+                                          ),
+                                          Row(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.spaceBetween,
+                                            children: [
+                                              Column(
+                                                children: [
+                                                  const Text('Habitaciones'),
+                                                  const Padding(
+                                                      padding:
+                                                          EdgeInsets.symmetric(
+                                                              vertical: 5)),
+                                                  SizedBox(
+                                                      height:
+                                                          size.height * 0.05,
+                                                      width: size.width * 0.18,
+                                                      child: TextField(
+                                                        onChanged: (value) {
+                                                          setState(() {
+                                                            clasification[
+                                                                    'habitaciones'] =
+                                                                value;
+                                                          });
+                                                        },
+                                                        textAlign:
+                                                            TextAlign.center,
+                                                        decoration: const InputDecoration(
+                                                            border: OutlineInputBorder(
+                                                                borderSide: BorderSide(
+                                                                    color: Colors
+                                                                        .black,
+                                                                    style: BorderStyle
+                                                                        .solid,
+                                                                    width: 1),
+                                                                borderRadius: BorderRadius
+                                                                    .all(Radius
+                                                                        .circular(
+                                                                            5.0)))),
+                                                        keyboardType:
+                                                            TextInputType
+                                                                .number,
+                                                      ))
+                                                ],
+                                              ),
+                                              Column(
+                                                children: [
+                                                  const Text('Baños'),
+                                                  const Padding(
+                                                      padding:
+                                                          EdgeInsets.symmetric(
+                                                              vertical: 5)),
+                                                  SizedBox(
+                                                      height:
+                                                          size.height * 0.05,
+                                                      width: size.width * 0.18,
+                                                      child: TextField(
+                                                        onChanged: (value) {
+                                                          setState(() {
+                                                            clasification[
+                                                                    'baños'] =
+                                                                value;
+                                                          });
+                                                        },
+                                                        textAlign:
+                                                            TextAlign.center,
+                                                        decoration: const InputDecoration(
+                                                            border: OutlineInputBorder(
+                                                                borderSide: BorderSide(
+                                                                    color: Colors
+                                                                        .black,
+                                                                    style: BorderStyle
+                                                                        .solid,
+                                                                    width: 1),
+                                                                borderRadius: BorderRadius
+                                                                    .all(Radius
+                                                                        .circular(
+                                                                            5.0)))),
+                                                        keyboardType:
+                                                            TextInputType
+                                                                .number,
+                                                      ))
+                                                ],
+                                              ),
+                                            ],
+                                          ),
+                                          const Padding(
+                                              padding: EdgeInsets.symmetric(
+                                                  vertical: 5)),
+                                          const Text('Cuartos de garage'),
+                                          const Padding(
+                                              padding: EdgeInsets.symmetric(
+                                                  vertical: 5)),
+                                          SizedBox(
+                                              height: size.height * 0.05,
+                                              width: size.width * 0.18,
+                                              child: TextField(
+                                                onChanged: (value) {
+                                                  setState(() {
+                                                    clasification['garage'] =
+                                                        value;
+                                                  });
+                                                },
+                                                textAlign: TextAlign.center,
+                                                decoration: const InputDecoration(
+                                                    border: OutlineInputBorder(
+                                                        borderSide: BorderSide(
+                                                            color: Colors.black,
+                                                            style: BorderStyle
+                                                                .solid,
+                                                            width: 1),
+                                                        borderRadius:
+                                                            BorderRadius.all(
+                                                                Radius.circular(
+                                                                    5.0)))),
+                                                keyboardType:
+                                                    TextInputType.number,
+                                              ))
+                                        ],
+                                      ),
+                                    ),
+                                  ),
+                                  actions: [
+                                    Center(
+                                      child: ElevatedButton(
+                                          onPressed: () {
+                                            Navigator.pop(context);
+                                          },
+                                          child: const Text('Filtrar')),
+                                    )
+                                  ],
+                                );
+                              });
+
+                          setState(() {
+                            hasChangedFilter = hasClasificationChanged();
+                          });
+                          // ACTUALIZAR LA LISTA DE MARKERS
+                          var res_data =
+                              await MySQLConnector.getMarkersbyCP(postalCode);
+                          List filteredList =
+                              filtiringList(res_data, clasification);
+
+                          MarkersCom markerscom = MarkersCom(filteredList);
+                          final markersComers =
+                              // ignore: use_build_context_synchronously
+                              await markerscom.printMarkersComers(
+                                  _customInfoWindowController,
+                                  context,
+                                  deviceData);
+                          setState(() {
+                            _markers.clear();
+
+                            for (Marker element in markersComers) {
+                              _markers[element.markerId] = element;
+                            }
+                          });
+                        },
+                        child: const Icon(Icons.filter_list_rounded)),
+                  );
                 } else {
                   return const Text('');
                 }
               }),
+              Builder(
+                builder: (context) {
+                  if (hasChangedFilter) {
+                    return Container(
+                      margin: EdgeInsets.symmetric(
+                          vertical: size.height * 0.12, horizontal: 10),
+                      child: ElevatedButton(
+                          style:
+                              ElevatedButton.styleFrom(primary: Colors.black),
+                          onPressed: () async {
+                            var res_data =
+            await MySQLConnector.getMarkersbyCP(postalCode);
+
+        MarkersCom markerscom = MarkersCom(res_data);
+        // ignore: use_build_context_synchronously
+        final markersComers = await markerscom.printMarkersComers(
+            _customInfoWindowController, context, deviceData);
+
+                            setState(() {
+                              for (var element in clasification.keys) {
+                                clasification[element] = null;
+                              }
+                              hasChangedFilter = hasClasificationChanged();
+
+                              // REGRESAR LOS MARKERS NORMALES
+                              _markers.clear();
+                              
+                              for (Marker element in markersComers) {
+                              _markers[element.markerId] = element;
+                            }
+
+                            });
+                          },
+                          child: const Icon(Icons.filter_list_off_rounded)),
+                    );
+                  }
+                  return SizedBox();
+                },
+              ),
               Builder(builder: (context) {
                 if (window_visiviliti == true || buttonAE.value == true) {
                   return Container(
@@ -932,5 +1119,86 @@ class _Map1State extends State<Map1> {
 
   void update() {
     setState(() {});
+  }
+
+  List filtiringList(List res_data, Map clasification) {
+    List listFiltered = [];
+
+    //   Map clasification = {
+    //   'm2': null,
+    //   'precio': null,
+    //   'habitaciones': null,
+    //   'baños': null,
+    //   'garage': null
+    // };
+
+    for (var i = 0; i < res_data.length; i++) {
+      int goTofilter = 0;
+
+      var place = res_data[i];
+      // print(place['nombre']);
+      // print(place['precio']);
+      if (clasification['m2'] != null && goTofilter != 2) {
+        RangeValues rangeM2 = clasification['m2'];
+        // print('verificando m3...');
+
+        if (double.parse(place['superficie_m3']) >= rangeM2.start &&
+            double.parse(place['superficie_m3']) <= rangeM2.end) {
+          goTofilter = 1;
+        } else {
+          goTofilter = 2;
+        }
+      }
+      if (clasification['precio'] != null && goTofilter != 2) {
+        // print('verificando precio...');
+
+        RangeValues rangePrice = clasification['precio'];
+        // print('Rango del filtro: ${rangePrice}');
+
+        if (double.parse(place['precio']) >= rangePrice.start &&
+            double.parse(place['precio']) <= rangePrice.end) {
+          goTofilter = 1;
+        } else {
+          goTofilter = 2;
+        }
+      }
+      if (clasification['habitaciones'] != null && goTofilter != 2) {
+        // print('verificando habitaciones...');
+        if (clasification['habitaciones'] == place['num_cuartos']) {
+          goTofilter = 1;
+        } else {
+          goTofilter = 2;
+        }
+      }
+      if (clasification['baños'] != null && goTofilter != 2) {
+        // print('verificando baños...');
+
+        if (clasification['baños'] == place['num_baños']) {
+          goTofilter = 1;
+        } else {
+          goTofilter = 2;
+        }
+      }
+      if (clasification['garage'] != null && goTofilter != 2) {
+        print('verificando garage...');
+
+        if (clasification['garage'] == place['num_cajones']) {
+          goTofilter = 1;
+        } else {
+          goTofilter = 2;
+        }
+      }
+
+      if (goTofilter == 1) {
+        listFiltered.add(place);
+      }
+    }
+    // print('LO FILTRADOOOOO');
+    // print(listFiltered.length);
+    // listFiltered.forEach((element) {
+    // print(element['nombre']);
+    // print(element['precio']);
+    // });
+    return listFiltered;
   }
 }

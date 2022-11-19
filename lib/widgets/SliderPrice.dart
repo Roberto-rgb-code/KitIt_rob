@@ -27,15 +27,10 @@ class _SliderPriceState extends State<SliderPrice> {
       values: values,
       onChanged: (RangeValues value) {
         setState(() {
-          // print('PRECIO CAMBIANDO:');
-          // print(value);
           values = value;
           widget.rangeValue(value);
         });
-        // print('Cambio?');
-        // print(values);
-        // print('Cambio?X2');
-        // print(widget.rangeValue(a){print(a);});
+
       },
     );
   }
