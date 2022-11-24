@@ -61,6 +61,9 @@ class _Map1State extends State<Map1> {
   ValueNotifier<List<int>> totalHabitantes =
       ValueNotifier<List<int>>([0, 0, 0]);
   bool hasChangedFilter = false;
+
+  final textFieldFocus = FocusNode();
+
   @override
   Widget build(BuildContext context) {
     var deviceData = MediaQuery.of(context);
@@ -115,6 +118,7 @@ class _Map1State extends State<Map1> {
     }
 
     void onTap(LatLng position) async {
+      textFieldFocus.unfocus();
       setState(() {
         postionOnTap = LatLng(position.latitude, position.longitude);
       });
@@ -294,26 +298,38 @@ class _Map1State extends State<Map1> {
                     SizedBox(
                       width: device_data.size.width * 0.7,
                       child: TextField(
+                        focusNode: textFieldFocus,
                         controller: _textLugar,
                         onChanged: (value) {
                           direccion.value = value;
                         },
-                        decoration: const InputDecoration(
-                            hoverColor: Colors.black,
-                            labelText: "Ingrese su direccion",
-                            labelStyle: TextStyle(color: Colors.black),
-                            border: OutlineInputBorder(
-                                borderSide: BorderSide(
-                                    style: BorderStyle.none, width: 0),
-                                borderRadius:
-                                    BorderRadius.all(Radius.circular(5.0)))),
+                        decoration: InputDecoration(
+                          hoverColor: Colors.black,
+                          labelText: "Ingrese su direccion",
+                          labelStyle: const TextStyle(color: Colors.black),
+                          border: const OutlineInputBorder(
+                            borderSide:
+                                BorderSide(style: BorderStyle.none, width: 0),
+                            borderRadius: BorderRadius.all(
+                              Radius.circular(5.0),
+                            ),
+                          ),
+                          suffixIcon: IconButton(
+                            onPressed: _textLugar.clear,
+                            icon: const Icon(
+                              Icons.clear,
+                              color: Colors.grey,
+                            ),
+                          ),
+                        ),
                       ),
                     ),
                     ElevatedButton(
                       style:
                           ElevatedButton.styleFrom(primary: DesingColors.dark),
                       onPressed: () async {
-                        // print('ENTRE AL ZOOM');
+                        textFieldFocus.unfocus();
+              
 
                         if (_textLugar.text == '') {
                           ScaffoldMessenger.of(context).showSnackBar(
@@ -321,9 +337,6 @@ class _Map1State extends State<Map1> {
                                   content: Text(
                                       'Escribe o selecciona una zona por favor')));
                         } else {
-                          print('Direccion: ');
-                          print(direccion.value);
-
                           final locations = await getLocation();
 
                           LatLng latLngPosition = LatLng(
@@ -367,8 +380,8 @@ class _Map1State extends State<Map1> {
 
                             postionOnTap = latLngPosition;
 
-                            hasPaintedAZone = true;
-                            myPolygon(resultados);
+                            // hasPaintedAZone = true;
+                            // myPolygon(resultados);
 
                             for (Marker element in markersComers) {
                               _markers[element.markerId] = element;
@@ -592,12 +605,15 @@ class _Map1State extends State<Map1> {
                               ElevatedButton.styleFrom(primary: Colors.black),
                           onPressed: () async {
                             var res_data =
-            await MySQLConnector.getMarkersbyCP(postalCode);
+                                await MySQLConnector.getMarkersbyCP(postalCode);
 
-        MarkersCom markerscom = MarkersCom(res_data);
-        // ignore: use_build_context_synchronously
-        final markersComers = await markerscom.printMarkersComers(
-            _customInfoWindowController, context, deviceData);
+                            MarkersCom markerscom = MarkersCom(res_data);
+                            // ignore: use_build_context_synchronously
+                            final markersComers =
+                                await markerscom.printMarkersComers(
+                                    _customInfoWindowController,
+                                    context,
+                                    deviceData);
 
                             setState(() {
                               for (var element in clasification.keys) {
@@ -607,11 +623,10 @@ class _Map1State extends State<Map1> {
 
                               // REGRESAR LOS MARKERS NORMALES
                               _markers.clear();
-                              
-                              for (Marker element in markersComers) {
-                              _markers[element.markerId] = element;
-                            }
 
+                              for (Marker element in markersComers) {
+                                _markers[element.markerId] = element;
+                              }
                             });
                           },
                           child: const Icon(Icons.filter_list_off_rounded)),
@@ -749,6 +764,7 @@ class _Map1State extends State<Map1> {
                             backgroundColor: DesingColors.yellow,
                             child: const Icon(Icons.storefront),
                             onTap: () {
+                              
                               showDialog(
                                   context: context,
                                   builder: (context) => StatefulBuilder(builder:
