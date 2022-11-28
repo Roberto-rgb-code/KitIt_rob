@@ -592,12 +592,15 @@ class _Map1State extends State<Map1> {
                               ElevatedButton.styleFrom(primary: Colors.black),
                           onPressed: () async {
                             var res_data =
-            await MySQLConnector.getMarkersbyCP(postalCode);
+                                await MySQLConnector.getMarkersbyCP(postalCode);
 
-        MarkersCom markerscom = MarkersCom(res_data);
-        // ignore: use_build_context_synchronously
-        final markersComers = await markerscom.printMarkersComers(
-            _customInfoWindowController, context, deviceData);
+                            MarkersCom markerscom = MarkersCom(res_data);
+                            // ignore: use_build_context_synchronously
+                            final markersComers =
+                                await markerscom.printMarkersComers(
+                                    _customInfoWindowController,
+                                    context,
+                                    deviceData);
 
                             setState(() {
                               for (var element in clasification.keys) {
@@ -607,11 +610,10 @@ class _Map1State extends State<Map1> {
 
                               // REGRESAR LOS MARKERS NORMALES
                               _markers.clear();
-                              
-                              for (Marker element in markersComers) {
-                              _markers[element.markerId] = element;
-                            }
 
+                              for (Marker element in markersComers) {
+                                _markers[element.markerId] = element;
+                              }
                             });
                           },
                           child: const Icon(Icons.filter_list_off_rounded)),
@@ -731,18 +733,21 @@ class _Map1State extends State<Map1> {
                             child: const Icon(Icons.gavel_rounded)),
                         SpeedDialChild(
                           backgroundColor: DesingColors.yellow,
-                          child: const Icon(Icons.route_rounded),
+                          child: const Icon(Icons.local_police_rounded),
                         ),
                         SpeedDialChild(
                           backgroundColor: DesingColors.yellow,
                           child: const Icon(Icons.analytics_rounded),
-                          onTap: () {
+                          onTap: () async {
+                            final otherDemografic =
+                                await MySQLConnector.getDemograficData();
                             showDialog(
                                 context: context,
                                 builder: (context) => DemograficModal(
-                                    total: totalHabitantes.value[0],
-                                    hombres: totalHabitantes.value[1],
-                                    mujeres: totalHabitantes.value[2]));
+                                    totalHabitantes.value[0],
+                                    totalHabitantes.value[1],
+                                    totalHabitantes.value[2],
+                                    otherDemografic));
                           },
                         ),
                         SpeedDialChild(
