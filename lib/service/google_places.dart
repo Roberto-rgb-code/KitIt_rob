@@ -8,15 +8,16 @@ import 'package:http/http.dart' as http;
 import '../assets/colors.dart';
 
 class GooglePlace {
-  static Future get_places_all(
-      String tipoLugar, String latitud, String longitud) async {
+  static Future get_places_all(String tipoLugar, latitud, longitud) async {
     List<Map> negocios = [];
-
     var response = await http.get(Uri.parse(
-        'https://maps.googleapis.com/maps/api/place/nearbysearch/json?keyword=${tipoLugar}&location=${latitud}%2C${longitud}&radius=1500&key=AIzaSyBW-I02qm2e2fhlbJg1mtL7bKG5ItJPB5A&language=es-419'));
+        'https://maps.googleapis.com/maps/api/place/nearbysearch/json?keyword=${tipoLugar}&location=${latitud}%2C${longitud}&radius=1500&key=AIzaSyBW-I02qm2e2fhlbJg1mtL7bKG5ItJPB5A&language=es-419'
+
+        ));
 
     if (response.statusCode == 200) {
       var data = json.decode(response.body);
+    
       try {
         for (var element in data["results"]) {
           negocios.add({
@@ -39,7 +40,12 @@ class GooglePlace {
   }
 
   static dynamic marker_window_places(id_marker, posicion, name,
-      CustomInfoWindowController _customInfoWindowController, icon) {
+      CustomInfoWindowController _customInfoWindowController) async {
+    print("holaaaaaaaaaaaaaa");
+    final icon = await BitmapDescriptor.fromAssetImage(
+      const ImageConfiguration(),
+      'lib/_img/marcador_google_places.png',
+    );
     Marker marker = Marker(
       icon: icon,
       markerId: MarkerId(id_marker),
