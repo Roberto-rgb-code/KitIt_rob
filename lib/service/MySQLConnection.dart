@@ -64,7 +64,6 @@ class MySQLConnector {
       {'CP': CP},
     );
     for (final row in result.rows) {
-    
       markers_list.add(row.assoc());
     }
     return markers_list;
