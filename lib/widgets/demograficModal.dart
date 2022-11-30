@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:kitit/assets/ColorPolygon.dart';
+import 'package:kitit/assets/colors.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
 
 class ChartData {
@@ -22,8 +25,9 @@ class DemograficModal extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final List<ChartData> chartData = [
-      ChartData(name: 'Hombres', value: hombres, color: Colors.blue),
-      ChartData(name: 'Mujeres', value: mujeres, color: Colors.red.shade400),
+      ChartData(name: 'Hombres', value: hombres, color: DesingColors.orange),
+      ChartData(
+          name: 'Mujeres', value: mujeres, color: ColorPolygon.borderColor),
     ];
 
     Size size = MediaQuery.of(context).size;

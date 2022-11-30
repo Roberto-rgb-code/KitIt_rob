@@ -33,7 +33,7 @@ class _window_mapState extends State<window_map> {
     return Container(
         decoration: const BoxDecoration(
           borderRadius: BorderRadius.all(Radius.circular(20)),
-          color: DesingColors.dark,
+          color: DesingColors.orange,
         ),
         child: SizedBox(
           child: Column(
@@ -44,25 +44,24 @@ class _window_mapState extends State<window_map> {
                   padding: const EdgeInsets.only(bottom: 15),
                   children: [
                     ListTile(
-                      leading: const Icon(Icons.girl, color: Color(0xffC2AB65)),
+                      leading: const Icon(Icons.girl, color: Colors.white),
                       title: Text(
                         "Femenino: ${widget.data["f"]}",
-                        style: const TextStyle(color: DesingColors.yellow),
+                        style: const TextStyle(color: Colors.white),
                       ),
                     ),
                     ListTile(
-                      leading: const Icon(Icons.man, color: Color(0xffC2AB65)),
+                      leading: const Icon(Icons.man, color: Colors.white),
                       title: Text(
                         "Masculino: ${widget.data["m"]}",
-                        style: const TextStyle(color: DesingColors.yellow),
+                        style: const TextStyle(color: Colors.white),
                       ),
                     ),
                     ListTile(
-                      leading:
-                          const Icon(Icons.people, color: Color(0xffC2AB65)),
+                      leading: const Icon(Icons.people, color: Colors.white),
                       title: Text(
                         "Total: ${widget.data["t"]}",
-                        style: const TextStyle(color: DesingColors.yellow),
+                        style: const TextStyle(color: Colors.white),
                       ),
                     ),
                   ],
