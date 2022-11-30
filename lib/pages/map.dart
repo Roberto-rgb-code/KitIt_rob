@@ -7,6 +7,7 @@ import 'package:kitit/assets/ColorPolygon.dart';
 import 'package:kitit/assets/colors.dart';
 import 'package:kitit/resourses/exceReader.dart';
 import 'package:kitit/service/MySQLConnection.dart';
+import 'package:kitit/service/dataSave.dart';
 import 'package:kitit/service/datos_predios.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:kitit/widgets/SliderM2.dart';
@@ -342,6 +343,7 @@ class _Map1State extends State<Map1> {
                         _polygonSetDisable.clear();
 
                         if (_textLugar.text == '') {
+                          DataSave.getInicio();
                           ScaffoldMessenger.of(context).showSnackBar(
                               const SnackBar(
                                   content: Text(
@@ -879,9 +881,6 @@ class _Map1State extends State<Map1> {
                                                               true
                                                           ? null
                                                           : () async {
-
-
-
                                                               final icon =
                                                                   await BitmapDescriptor
                                                                       .fromAssetImage(
@@ -977,10 +976,6 @@ class _Map1State extends State<Map1> {
                                                                       const Offset(
                                                                           0.5,
                                                                           1),
-
-
-
-
                                                                   onTap: () {
                                                                     buttonAE.value =
                                                                         true;
@@ -1023,8 +1018,6 @@ class _Map1State extends State<Map1> {
                                                                         position);
                                                                     update();
                                                                   },
-
-                                                                  
                                                                   draggable:
                                                                       false,
                                                                 );

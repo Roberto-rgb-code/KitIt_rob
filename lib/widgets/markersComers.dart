@@ -34,7 +34,6 @@ class MarkersCom {
     List LonLat_markers = [];
     Size size = deviceData.size;
     for (var i = 0; i < data_markers.length; i++) {
-
       String cord_aux = data_markers[i]["coordenadas"].replaceAll(" ", "");
 
       List cord_list = cord_aux.split(",");
@@ -201,8 +200,8 @@ class MarkersCom {
   Row row_(int i, String nombreData, String tipoData) {
     return Row(
       children: [
-        texto_(nombreData, 23, FontWeight.bold),
-        texto_(tipoData, 20, FontWeight.w500),
+        texto_(nombreData, 23, FontWeight.bold), //cambiar a 16
+        texto_(tipoData, 20, FontWeight.w500), // cambiar a 14
       ],
     );
   }
