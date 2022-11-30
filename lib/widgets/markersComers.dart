@@ -30,7 +30,7 @@ class MarkersCom {
       context,
       MediaQueryData deviceData) async {
     final icon = await BitmapDescriptor.fromAssetImage(
-        const ImageConfiguration(), 'lib/_img/dispv1.png');
+        const ImageConfiguration(), 'lib/_img/MARCADOR_PALOMA.png');
     List LonLat_markers = [];
     Size size = deviceData.size;
     for (var i = 0; i < data_markers.length; i++) {
