@@ -334,8 +334,8 @@ class _Map1State extends State<Map1> {
                       ),
                     ),
                     ElevatedButton(
-                      style:
-                          ElevatedButton.styleFrom(primary: DesingColors.dark),
+                      style: ElevatedButton.styleFrom(
+                          primary: DesingColors.orange),
                       onPressed: () async {
                         textFieldFocus.unfocus();
                         _markers.clear();
@@ -403,7 +403,6 @@ class _Map1State extends State<Map1> {
                       },
                       child: const Icon(
                         Icons.search_rounded,
-                        // color: DesingColors.yellow,
                       ),
                     ),
                   ],
@@ -768,7 +767,7 @@ class _Map1State extends State<Map1> {
                       spaceBetweenChildren: 10,
                       children: [
                         SpeedDialChild(
-                            backgroundColor: DesingColors.yellow,
+                            backgroundColor: DesingColors.orange,
                             onTap: () {
                               setState(
                                 () {
@@ -780,26 +779,35 @@ class _Map1State extends State<Map1> {
                                 },
                               );
                             },
-                            child: const Icon(Icons.gavel_rounded)),
+                            child: const Icon(
+                              Icons.gavel_rounded,
+                              color: Colors.white,
+                            )),
                         SpeedDialChild(
                           backgroundColor: DesingColors.yellow,
-                          child: const Icon(Icons.route_rounded),
+                          child: const Icon(Icons.local_police_rounded),
                         ),
                         SpeedDialChild(
                           backgroundColor: DesingColors.yellow,
                           child: const Icon(Icons.analytics_rounded),
-                          onTap: () {
+                          onTap: () async {
+                            final otherDemografic =
+                                await MySQLConnector.getDemograficData();
                             showDialog(
                                 context: context,
                                 builder: (context) => DemograficModal(
-                                    total: totalHabitantes.value[0],
-                                    hombres: totalHabitantes.value[1],
-                                    mujeres: totalHabitantes.value[2]));
+                                    totalHabitantes.value[0],
+                                    totalHabitantes.value[1],
+                                    totalHabitantes.value[2],
+                                    otherDemografic));
                           },
                         ),
                         SpeedDialChild(
-                            backgroundColor: DesingColors.yellow,
-                            child: const Icon(Icons.storefront),
+                            backgroundColor: DesingColors.orange,
+                            child: const Icon(
+                              Icons.storefront,
+                              color: Colors.white,
+                            ),
                             onTap: () {
                               showDialog(
                                   context: context,
@@ -820,7 +828,7 @@ class _Map1State extends State<Map1> {
                                                 decoration: InputDecoration(
                                                     suffixIcon: Container(
                                                       color:
-                                                          DesingColors.yellow,
+                                                          DesingColors.orange,
                                                       child: IconButton(
                                                         onPressed: () async {
                                                           var isEconomyActivity =
@@ -885,7 +893,7 @@ class _Map1State extends State<Map1> {
                                                                   await BitmapDescriptor
                                                                       .fromAssetImage(
                                                                 const ImageConfiguration(),
-                                                                'lib/_img/amarilloyblanco(1).png',
+                                                                'lib/_img/marcador_denue_chico.png',
                                                               );
                                                               int cont = 0;
                                                               List<Map> list = await datosDenue.fetchPost(
