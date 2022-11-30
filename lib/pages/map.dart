@@ -782,25 +782,22 @@ class _Map1State extends State<Map1> {
                               color: Colors.white,
                             )),
                         SpeedDialChild(
-                          backgroundColor: DesingColors.orange,
-                          child: const Icon(
-                            Icons.route_rounded,
-                            color: Colors.white,
-                          ),
+                          backgroundColor: DesingColors.yellow,
+                          child: const Icon(Icons.local_police_rounded),
                         ),
                         SpeedDialChild(
-                          backgroundColor: DesingColors.orange,
-                          child: const Icon(
-                            Icons.analytics_rounded,
-                            color: Colors.white,
-                          ),
-                          onTap: () {
+                          backgroundColor: DesingColors.yellow,
+                          child: const Icon(Icons.analytics_rounded),
+                          onTap: () async {
+                            final otherDemografic =
+                                await MySQLConnector.getDemograficData();
                             showDialog(
                                 context: context,
                                 builder: (context) => DemograficModal(
-                                    total: totalHabitantes.value[0],
-                                    hombres: totalHabitantes.value[1],
-                                    mujeres: totalHabitantes.value[2]));
+                                    totalHabitantes.value[0],
+                                    totalHabitantes.value[1],
+                                    totalHabitantes.value[2],
+                                    otherDemografic));
                           },
                         ),
                         SpeedDialChild(
