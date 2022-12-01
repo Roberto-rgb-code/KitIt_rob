@@ -3,7 +3,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 class DataSave {
   static void setInicio() async {
     final prefs = await SharedPreferences.getInstance();
-    prefs.setBool('entro', true).then((value) => {});
+    prefs.setBool('entro', true).then((value) => {print("valorrrrrrrrrrrrrr")});
   }
 
   static Future<bool?> getInicio() async {

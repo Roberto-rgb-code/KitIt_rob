@@ -39,7 +39,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
         title: 'ExitoXY',
         debugShowCheckedModeBanner: false,
-        // initialRoute: entro ? 'map' : 'onBording',
+      //  initialRoute: entro ? 'map' : 'onBording',
         initialRoute: 'map',
         routes: {
           'map': (BuildContext context) => Map1(),
