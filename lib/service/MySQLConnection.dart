@@ -2,11 +2,11 @@ import 'package:mysql_client/mysql_client.dart';
 
 class MySQLConnector {
   static final connector = MySQLConnectionPool(
-      host: "173.201.188.200",
+      host: "10.0.2.2",
       port: 3306,
-      userName: "dbUKikitLocales",
-      password: "[D^JosvIrT{u",
-      databaseName: "KIKIT_locales", // optional
+      userName: "root",
+      password: "kevin",
+      databaseName: "kikit", // optional
       maxConnections: 100);
 
   static Future<List> getData(CP) async {

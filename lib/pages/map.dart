@@ -335,7 +335,7 @@ class _Map1State extends State<Map1> {
                     ),
                     ElevatedButton(
                       style: ElevatedButton.styleFrom(
-                          primary: DesingColors.orange),
+                          backgroundColor: DesingColors.orange),
                       onPressed: () async {
                         textFieldFocus.unfocus();
                         _markers.clear();
@@ -414,7 +414,7 @@ class _Map1State extends State<Map1> {
                     margin: EdgeInsets.symmetric(
                         vertical: size.height * 0.12, horizontal: 10),
                     child: ElevatedButton(
-                        style: ElevatedButton.styleFrom(primary: Colors.black),
+                        style: ElevatedButton.styleFrom(backgroundColor: Colors.black),
                         onPressed: () async {
                           ///////
 
@@ -613,7 +613,7 @@ class _Map1State extends State<Map1> {
                           vertical: size.height * 0.12, horizontal: 10),
                       child: ElevatedButton(
                           style:
-                              ElevatedButton.styleFrom(primary: Colors.black),
+                              ElevatedButton.styleFrom(backgroundColor: Colors.black),
                           onPressed: () async {
                             var res_data =
                                 await MySQLConnector.getMarkersbyCP(postalCode);
@@ -882,7 +882,7 @@ class _Map1State extends State<Map1> {
                                               child: ElevatedButton(
                                                   style:
                                                       ElevatedButton.styleFrom(
-                                                          primary: DesingColors
+                                                          backgroundColor: DesingColors
                                                               .dark),
                                                   onPressed:
                                                       buttonDisable.value ==
@@ -907,14 +907,10 @@ class _Map1State extends State<Map1> {
                                                                       .toString());
                                                               //CODE GOOGLE PLACES ................................
                                                               List<Map> lista_places = await GooglePlace.get_places_all(
-                                                                  actividadEconomica
-                                                                      .value,
-                                                                  postionOnTap!
-                                                                      .latitude
-                                                                      .toString(),
-                                                                  postionOnTap!
-                                                                      .longitude
-                                                                      .toString());
+  actividadEconomica.value,
+  postionOnTap!.latitude,
+  postionOnTap!.longitude,
+);
                                                               int contador_places =
                                                                   0;
 

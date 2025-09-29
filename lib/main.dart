@@ -9,20 +9,33 @@ import 'package:kitit/resourses/exceReader.dart';
 import 'package:kitit/service/MySQLConnection.dart';
 
 void main() async {
+  WidgetsFlutterBinding.ensureInitialized(); // <- primero
+
+  // Si usas shared_preferences dentro de DataSave, ahora no truena.
   bool? entro = await DataSave.getInicio();
   print("VALOR INICIa app____________________________________________________");
   print(entro);
   entro ??= false;
 
+  // Inicializa tu conector MySQL (asegúrate de que maneje errores internos)
   MySQLConnector();
-  WidgetsFlutterBinding.ensureInitialized();
 
-  await ExcelReader.init();
+  // Evitar que falle el arranque si GSheets no está configurado
+  try {
+    print("Conectando a la hoja de calculo...");
+    await ExcelReader.init();
+    print("GSheets OK");
+  } catch (e, st) {
+    print("GSheets deshabilitado temporalmente: $e");
+    // Opcional: log detallado
+    // print(st);
+  }
 
   HttpOverrides.global = MyHttpOverrides();
 
   runApp(MyApp(entro));
 }
+
 
 class MyApp extends StatelessWidget {
   late bool entro;
