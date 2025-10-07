@@ -49,3 +49,9 @@ android_backup/
 *.apk
 *.so
 *.bin
+
+android_backup/
+android_backup/**/*
+build/
+*.apk
+*.so
