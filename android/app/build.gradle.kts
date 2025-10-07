@@ -4,6 +4,9 @@ import com.android.build.gradle.internal.cxx.configure.gradleLocalProperties
 
 plugins {
     id("com.android.application")
+    // START: FlutterFire Configuration
+    id("com.google.gms.google-services")
+    // END: FlutterFire Configuration
     id("kotlin-android")
     // El plugin de Flutter debe ir después de Android/Kotlin
     id("dev.flutter.flutter-gradle-plugin")

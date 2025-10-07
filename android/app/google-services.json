@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "600908153185",
+    "project_id": "exitoxy-398e0",
+    "storage_bucket": "exitoxy-398e0.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:600908153185:android:94138d32f8302250e80520",
+        "android_client_info": {
+          "package_name": "com.example.kitit"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDYIsrxqqrYZd2hlE2KFMawFOKua57QNcI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:600908153185:android:7df9217c0e03e0bfe80520",
+        "android_client_info": {
+          "package_name": "exitoyxv123.WW.WW"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDYIsrxqqrYZd2hlE2KFMawFOKua57QNcI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

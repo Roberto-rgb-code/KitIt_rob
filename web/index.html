@@ -2,19 +2,11 @@
 <html>
 <head>
   <!--
-    If you are serving your web app in a path other than the root, change the
-    href value below to reflect the base path you are serving from.
-
-    The path provided below has to start and end with a slash "/" in order for
-    it to work correctly.
-
-    For more details:
-    * https://developer.mozilla.org/en-US/docs/Web/HTML/Element/base
-
-    This is a placeholder for base href that will be replaced by the value of
-    the `--base-href` argument provided to `flutter build`.
+    Si sirves tu app Flutter en una ruta distinta a la raíz, cambia el valor
+    de href aquí abajo. Debe empezar y terminar con "/".
+    Ejemplo: <base href="/subcarpeta/">
   -->
-  <base href="$FLUTTER_BASE_HREF">
+  <base href="/">
 
   <meta charset="UTF-8">
   <meta content="IE=Edge" http-equiv="X-UA-Compatible">
@@ -33,16 +25,19 @@
   <link rel="manifest" href="manifest.json">
 
   <script>
-    // The value below is injected by flutter build, do not touch.
-    var serviceWorkerVersion = null;
+    // Este valor lo inyecta Flutter en build, no lo cambies
+    var serviceWorkerVersion = "{{flutter_service_worker_version}}";
   </script>
-  <!-- This script adds the flutter initialization JS code -->
+
+  <!-- Google Maps JS API -->
+  <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAtWc3gF7u8i7tiLCxuN5KoGxEf-a8FRKY&v=weekly&libraries=places"></script>
+
+  <!-- Inicialización de Flutter -->
   <script src="flutter.js" defer></script>
 </head>
 <body>
   <script>
     window.addEventListener('load', function(ev) {
-      // Download main.dart.js
       _flutter.loader.loadEntrypoint({
         serviceWorker: {
           serviceWorkerVersion: serviceWorkerVersion,
