@@ -16,7 +16,9 @@ migrate_working_dir/
 *.iws
 .idea/
 
-# VS Code related (uncomment if you want to include .vscode)
+# The .vscode folder contains launch configuration and tasks you configure in
+# VS Code which you may wish to be included in version control, so this line
+# is commented out by default.
 #.vscode/
 
 # Flutter/Dart/Pub related
@@ -39,19 +41,37 @@ app.*.symbols
 # Obfuscation related
 app.*.map.json
 
-# Android Studio build artifacts
+# Android Studio will place build artifacts here
 /android/app/debug
 /android/app/profile
 /android/app/release
 
-# Additional build and binary files (new entries)
-android_backup/
-*.apk
-*.so
-*.bin
-
+# Ignorar la carpeta android_backup y sus contenidos
 android_backup/
 android_backup/**/*
+
+# Ignorar archivos grandes generados por builds
 build/
 *.apk
+*.aab
 *.so
+
+# Ignorar el archivo con credenciales
+lib/resourses/exceReader.dart
+
+# Ignorar archivos y carpetas típicos de Flutter
+.flutter-plugins
+.flutter-plugins-dependencies
+.pub/
+.dart_tool/
+.idea/
+*.iml
+*.log
+*.iws
+*.ipr
+*.dba
+*.pid
+*.pid.lock
+*.versions
+.packages
+.pubspec.lock
